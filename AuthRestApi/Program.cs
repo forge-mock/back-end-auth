@@ -1,12 +1,26 @@
+using Auth.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(
+    options =>
+    {
+        options.AddPolicy(
+            "AllowDevelopment",
+            policy =>
+            {
+                policy.WithOrigins("https://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    .WithHeaders("X-Forge-Mock-Auth", "Content-Type");
+            });
+    });
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -14,6 +28,28 @@ if (app.Environment.IsDevelopment())
         options =>
         {
             options.WithTheme(ScalarTheme.Purple).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.Http);
+        });
+    app.Use(
+        async (context, next) =>
+        {
+            Middleware.ConfigureHeaders(ref context);
+            await next();
+        });
+}
+else
+{
+    app.Use(
+        async (context, next) =>
+        {
+            if (!context.Request.Headers.ContainsKey("X-Forge-Mock-Auth") ||
+                !context.Request.Headers.ContainsKey("Content-Type"))
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                return;
+            }
+
+            Middleware.ConfigureHeaders(ref context);
+            await next();
         });
 }
 
