@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthRestApi", "AuthRestApi\AuthRestApi.csproj", "{50E4AB89-49A1-4A9B-8186-866E8C0522EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api.Rest", "Auth.Api.Rest\Auth.Api.Rest.csproj", "{50E4AB89-49A1-4A9B-8186-866E8C0522EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{3648B005-6E55-4F1C-86A3-BE3505829933}"
 	ProjectSection(SolutionItems) = preProject
@@ -8,15 +8,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{3648B005-6
 		.gitignore = .gitignore
 		.editorconfig = .editorconfig
 		LICENSE = LICENSE
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthDomain", "AuthDomain\AuthDomain.csproj", "{44773E22-52D1-4987-9B20-8B4697AB48DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain", "Auth.Domain\Auth.Domain.csproj", "{44773E22-52D1-4987-9B20-8B4697AB48DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthApplication", "AuthApplication\AuthApplication.csproj", "{D9739E25-8C1E-4925-B5A8-13244C0E8BE3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Application", "Auth.Application\Auth.Application.csproj", "{D9739E25-8C1E-4925-B5A8-13244C0E8BE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{5E2493B9-6702-490D-815A-3FCD1FD90801}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Persistence", "Auth.Persistence\Auth.Persistence.csproj", "{BF501665-318F-4B34-A004-6BA95C0E2DFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthPersistence", "AuthPersistence\AuthPersistence.csproj", "{BF501665-318F-4B34-A004-6BA95C0E2DFA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Service", "Auth.Service\Auth.Service.csproj", "{974BB337-36CB-4CC6-929E-DAF24F62A37D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,13 +37,13 @@ Global
 		{D9739E25-8C1E-4925-B5A8-13244C0E8BE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9739E25-8C1E-4925-B5A8-13244C0E8BE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9739E25-8C1E-4925-B5A8-13244C0E8BE3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E2493B9-6702-490D-815A-3FCD1FD90801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E2493B9-6702-490D-815A-3FCD1FD90801}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E2493B9-6702-490D-815A-3FCD1FD90801}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E2493B9-6702-490D-815A-3FCD1FD90801}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF501665-318F-4B34-A004-6BA95C0E2DFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF501665-318F-4B34-A004-6BA95C0E2DFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF501665-318F-4B34-A004-6BA95C0E2DFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF501665-318F-4B34-A004-6BA95C0E2DFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{974BB337-36CB-4CC6-929E-DAF24F62A37D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{974BB337-36CB-4CC6-929E-DAF24F62A37D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{974BB337-36CB-4CC6-929E-DAF24F62A37D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{974BB337-36CB-4CC6-929E-DAF24F62A37D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

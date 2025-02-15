@@ -14,3 +14,13 @@ indent_size = 2
 
 [*.{appxmanifest,asax,ascx,aspx,axaml,build,c,c++,c++m,cc,ccm,cginc,compute,cp,cpp,cppm,cs,cshtml,cu,cuh,cxx,cxxm,dtd,fs,fsi,fsscript,fsx,fx,fxh,h,hh,hlsl,hlsli,hlslinc,hpp,hxx,inc,inl,ino,ipp,ixx,master,ml,mli,mpp,mq4,mq5,mqh,mxx,nuspec,paml,razor,resw,resx,shader,skin,tpp,usf,ush,uxml,vb,xaml,xamlx,xoml,xsd}]
 tab_width = 4
+
+# Stylecop rules
+# XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+# Closing parenthesis should not be followed by a space
+dotnet_diagnostic.SA1009.severity = none
+# Using directive should appear within a namespace declaration
+dotnet_diagnostic.SA1200.severity = none
+# File header rule
+dotnet_diagnostic.SA1633.severity = none

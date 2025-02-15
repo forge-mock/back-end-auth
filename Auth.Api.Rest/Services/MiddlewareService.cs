@@ -1,10 +1,11 @@
+using Auth.Api.Rest.Interfaces;
 using Auth.Entities;
 
-namespace Auth.Services;
+namespace Auth.Api.Rest.Services;
 
-public static class Middleware
+internal sealed class MiddlewareService : IMiddlewareService
 {
-    public static void ConfigureHeaders(ref HttpContext context)
+    public void ConfigureHeaders(ref HttpContext context)
     {
         context.Response.Headers.Append(
             "Content-Security-Policy",

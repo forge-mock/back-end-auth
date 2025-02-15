@@ -1,4 +1,5 @@
-using Auth.Services;
+using Auth.Api.Rest.Extensions;
+using Auth.Api.Rest.Interfaces;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,8 @@ builder.Services.AddCors(
             });
     });
 
+builder.Services.AddApiRestServices();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -32,7 +35,8 @@ if (app.Environment.IsDevelopment())
     app.Use(
         async (context, next) =>
         {
-            Middleware.ConfigureHeaders(ref context);
+            var middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
+            middlewareService.ConfigureHeaders(ref context);
             await next();
         });
 }
@@ -48,7 +52,8 @@ else
                 return;
             }
 
-            Middleware.ConfigureHeaders(ref context);
+            var middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
+            middlewareService.ConfigureHeaders(ref context);
             await next();
         });
 }
