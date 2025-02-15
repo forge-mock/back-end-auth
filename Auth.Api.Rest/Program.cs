@@ -1,6 +1,6 @@
+using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Extensions;
 using Auth.Api.Rest.Interfaces;
-using Auth.Constants;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,4 +1,4 @@
-namespace Auth.Constants;
+namespace Auth.Api.Rest.Constants;
 
 internal static class HttpHeaders
 {

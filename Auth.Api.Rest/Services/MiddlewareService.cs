@@ -1,5 +1,5 @@
+using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Interfaces;
-using Auth.Constants;
 
 namespace Auth.Api.Rest.Services;
 
