@@ -1,5 +1,6 @@
 using Auth.Api.Rest.Extensions;
 using Auth.Api.Rest.Interfaces;
+using Auth.Constants;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,7 @@ builder.Services.AddCors(
                 policy.WithOrigins("https://localhost:3000")
                     .AllowAnyMethod()
                     .AllowCredentials()
-                    .WithHeaders("X-Forge-Mock-Auth", "Content-Type");
+                    .WithHeaders(HttpHeaders.ForgeMockAuth, HttpHeaders.ForgeMockAuth);
             });
     });
 
@@ -45,8 +46,8 @@ else
     app.Use(
         async (context, next) =>
         {
-            if (!context.Request.Headers.ContainsKey("X-Forge-Mock-Auth") ||
-                !context.Request.Headers.ContainsKey("Content-Type"))
+            if (!context.Request.Headers.ContainsKey(HttpHeaders.ForgeMockAuth) ||
+                !context.Request.Headers.ContainsKey(HttpHeaders.ContentType))
             {
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
