@@ -1,4 +1,4 @@
-﻿namespace Auth.Domain.Models;
+﻿namespace Auth.Domain.Models.Users;
 
 public sealed class User
 {

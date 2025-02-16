@@ -13,4 +13,9 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.0.12"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Auth.Application\Auth.Application.csproj"/>
+        <ProjectReference Include="..\Auth.Persistence\Auth.Persistence.csproj"/>
+    </ItemGroup>
+
 </Project>

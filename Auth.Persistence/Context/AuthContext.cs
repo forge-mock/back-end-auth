@@ -1,4 +1,5 @@
 ﻿using Auth.Domain.Models;
+using Auth.Domain.Models.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auth.Persistence.Context;

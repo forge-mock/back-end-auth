@@ -1,15 +1,15 @@
 using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Extensions;
 using Auth.Api.Rest.Interfaces;
+using Auth.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
-
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddCors(
     options =>
-    {
         options.AddPolicy(
             "AllowDevelopment",
             policy =>
@@ -18,25 +18,28 @@ builder.Services.AddCors(
                     .AllowAnyMethod()
                     .AllowCredentials()
                     .WithHeaders(HttpHeaders.ForgeMockAuth, HttpHeaders.ForgeMockAuth);
-            });
-    });
+            }));
 
+builder.Services.AddDbContext<AuthContext>(
+    options =>
+        options.UseNpgsql(Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION_STRING")));
+builder.Services.AddControllers();
+builder.Services.AddRepositories();
+builder.Services.AddApplicationServices();
 builder.Services.AddApiRestServices();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference(
         options =>
-        {
-            options.WithTheme(ScalarTheme.Purple).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.Http);
-        });
+            options.WithTheme(ScalarTheme.Purple).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.Http));
     app.Use(
         async (context, next) =>
         {
-            var middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
+            IMiddlewareService middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
             middlewareService.ConfigureHeaders(ref context);
             await next();
         });
@@ -53,36 +56,13 @@ else
                 return;
             }
 
-            var middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
+            IMiddlewareService middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
             middlewareService.ConfigureHeaders(ref context);
             await next();
         });
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching",
-};
-
-app.MapGet(
-    "/weatherforecast",
-    () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(
-                index =>
-                    new WeatherForecast(
-                        DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                        Random.Shared.Next(-20, 55),
-                        summaries[Random.Shared.Next(summaries.Length)]))
-            .ToArray();
-        return forecast;
-    }).WithName("GetWeatherForecast");
+app.MapControllers();
 
 await app.RunAsync();
-
-internal record WeatherForecast(DateOnly date, int temperatureC, string? summary)
-{
-    public int TemperatureF => 32 + (int)(this.temperatureC / 0.5556);
-}

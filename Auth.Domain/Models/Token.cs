@@ -1,4 +1,6 @@
-﻿namespace Auth.Domain.Models;
+﻿using Auth.Domain.Models.Users;
+
+namespace Auth.Domain.Models;
 
 public sealed class Token
 {

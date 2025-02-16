@@ -20,6 +20,8 @@ tab_width = 4
 dotnet_diagnostic.SA0001.severity = none
 # Closing parenthesis should not be followed by a space
 dotnet_diagnostic.SA1009.severity = none
+# Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
 # Using directive should appear within a namespace declaration
 dotnet_diagnostic.SA1200.severity = none
 # File header rule
