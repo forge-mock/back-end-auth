@@ -10,5 +10,7 @@ public interface IAuthRepository
 
     public Task<Result<User>> RegisterUser(User user);
 
+    public Task<Result<bool>> CheckIsUserExists(string username, string userEmail);
+
     public Task<Token> RefreshToken(Guid userId);
 }

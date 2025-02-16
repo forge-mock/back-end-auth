@@ -19,7 +19,14 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
 
             Result<UserIdentify> result = await authRepository.IdentifyUser(login.UserInput, login.Password);
 
-            return result.IsFailed ? result : Result.Ok(result.Value);
+            if (result.IsFailed)
+            {
+                return result;
+            }
+
+            bool isUserValid = result.Value.Password == login.Password;
+
+            return isUserValid ? Result.Ok(result.Value) : Result.Fail("Username or password is incorrect");
         }
         catch (Exception ex)
         {
@@ -36,6 +43,13 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 string.IsNullOrEmpty(register.Password))
             {
                 return Result.Fail("Username, user email and password should not be empty");
+            }
+
+            Result<bool> isUserExists = await authRepository.CheckIsUserExists(register.Username, register.UserEmail);
+
+            if (isUserExists.Value)
+            {
+                return Result.Fail("User already exists");
             }
 
             User user = new()
