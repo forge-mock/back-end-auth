@@ -31,7 +31,7 @@ source ~/.bash_profile
 
 ```bash
 setx JWT_SECRET "random_secret" /M
-setx AUTH_DB_CONNECTION_STRING "Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" >> ~/.bash_profile
+setx AUTH_DB_CONNECTION_STRING "Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" /M
 ```
 
 4. It's recommended to reload the terminal and restart the IDE.
