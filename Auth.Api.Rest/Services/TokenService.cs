@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Auth.Api.Rest.Interfaces;
 using Auth.Domain.Constants;
@@ -49,5 +50,10 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
         {
             return Result.Fail(ErrorMessage.Exception);
         }
+    }
+
+    public string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
     }
 }

@@ -12,5 +12,7 @@ public interface IAuthRepository
 
     public Task<Result<bool>> CheckIsUserExists(string username, string userEmail);
 
-    public Task<Token> UpdateRefreshToken(Guid userId);
+    public Task<Result<Token>> CreateRefreshToken(Token token);
+
+    public Task<Result<Token>> UpdateRefreshToken(Token token);
 }

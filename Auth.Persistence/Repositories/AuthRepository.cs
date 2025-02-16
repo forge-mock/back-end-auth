@@ -58,8 +58,31 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public Task<Token> UpdateRefreshToken(Guid userId)
+    public async Task<Result<Token>> CreateRefreshToken(Token token)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await context.Tokens.AddAsync(token);
+            await context.SaveChangesAsync();
+            return Result.Ok(token);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public async Task<Result<Token>> UpdateRefreshToken(Token token)
+    {
+        try
+        {
+            context.Tokens.Update(token);
+            await context.SaveChangesAsync();
+            return Result.Ok(token);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
     }
 }

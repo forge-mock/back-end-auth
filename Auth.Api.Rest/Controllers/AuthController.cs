@@ -29,19 +29,22 @@ public class AuthController(IAuthService authService, ITokenService tokenService
             return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
         }
 
+        string refreshToken = tokenService.GenerateRefreshToken();
+
         return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto register)
     {
-        Result<User> result = await authService.Register(register);
+        string refreshToken = tokenService.GenerateRefreshToken();
+        Result<string> result = await authService.Register(register, refreshToken);
 
         if (result.IsFailed)
         {
             return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
         }
 
-        return Ok(new ResultSuccessDto<User>(result.IsSuccess, result.Value));
+        return Ok(new ResultSuccessDto<string>(result.IsSuccess, result.Value));
     }
 }

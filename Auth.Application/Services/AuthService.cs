@@ -1,6 +1,7 @@
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Domain.Constants;
+using Auth.Domain.Models;
 using Auth.Domain.Models.Users;
 using Auth.Domain.Repositories;
 using FluentResults;
@@ -35,7 +36,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         }
     }
 
-    public async Task<Result<User>> Register(RegisterDto register)
+    public async Task<Result<string>> Register(RegisterDto register, string refreshToken)
     {
         try
         {
@@ -64,11 +65,32 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
 
             Result<User> result = await authRepository.RegisterUser(user);
 
-            return result.IsFailed ? result : Result.Ok(result.Value);
+            if (result.IsFailed)
+            {
+                return Result.Fail(result.Errors);
+            }
+
+            Token token = new()
+            {
+                Id = Guid.NewGuid(),
+                Name = refreshToken,
+                CreatedDate = DateTime.UtcNow,
+                ExpirationDate = DateTime.UtcNow.AddDays(30),
+                UserId = user.Id,
+            };
+
+            Result<Token> tokenResult = await authRepository.CreateRefreshToken(token);
+
+            return Result.Ok(tokenResult.Value.Name);
         }
         catch
         {
             return Result.Fail(ErrorMessage.Exception);
         }
+    }
+
+    public Task<Result<string>> RefreshToken(string refreshToken)
+    {
+        throw new NotImplementedException();
     }
 }

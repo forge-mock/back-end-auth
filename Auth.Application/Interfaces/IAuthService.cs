@@ -8,5 +8,7 @@ public interface IAuthService
 {
     public Task<Result<UserIdentify>> Authenticate(LoginDto login);
 
-    public Task<Result<User>> Register(RegisterDto register);
+    public Task<Result<string>> Register(RegisterDto register, string refreshToken);
+
+    public Task<Result<string>> RefreshToken(string refreshToken);
 }
