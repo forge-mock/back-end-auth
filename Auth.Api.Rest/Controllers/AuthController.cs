@@ -38,6 +38,8 @@ public class AuthController(IAuthService authService, ITokenService tokenService
             return BadRequest(new ResultFailDto(refreshTokenResult.IsSuccess, refreshTokenResult.Errors));
         }
 
+        SetRefreshTokenCookie(refreshTokenResult.Value);
+
         return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
     }
 
@@ -60,6 +62,21 @@ public class AuthController(IAuthService authService, ITokenService tokenService
             return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
         }
 
+        SetRefreshTokenCookie(refreshToken);
+
         return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
+    }
+
+    private void SetRefreshTokenCookie(string refreshToken)
+    {
+        CookieOptions cookieOptions = new()
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(30),
+        };
+
+        Response.Cookies.Append("refresh_token", refreshToken, cookieOptions);
     }
 }

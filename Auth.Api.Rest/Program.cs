@@ -62,6 +62,7 @@ else
         });
 }
 
+app.UseCors("AllowDevelopment");
 app.UseHttpsRedirection();
 app.MapControllers();
 
