@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using Auth.Api.Rest.Interfaces;
+using Auth.Domain.Constants;
 using Auth.Domain.Models.Users;
 using FluentResults;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -32,7 +33,7 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
                     new Claim(JwtRegisteredClaimNames.Name, user.Username),
                     new Claim(JwtRegisteredClaimNames.Email, user.UserEmail),
                 ]),
-                Expires = DateTime.Now.ToUniversalTime()
+                Expires = DateTime.UtcNow
                     .AddMinutes(configuration.GetValue<int>("Jwt:ExpirationTime")),
                 SigningCredentials = credentials,
                 Issuer = configuration["Jwt:Issuer"],
@@ -46,7 +47,7 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
         }
         catch
         {
-            return Result.Fail("An unknown error occurred. Please, connect to our support!");
+            return Result.Fail(ErrorMessage.Exception);
         }
     }
 }

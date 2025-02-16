@@ -1,5 +1,6 @@
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
+using Auth.Domain.Constants;
 using Auth.Domain.Models.Users;
 using Auth.Domain.Repositories;
 using FluentResults;
@@ -30,7 +31,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         }
         catch
         {
-            return Result.Fail("An unknown error occurred. Please, connect to our support!");
+            return Result.Fail(ErrorMessage.Exception);
         }
     }
 
@@ -58,7 +59,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 Username = register.Username,
                 UserEmail = register.UserEmail,
                 Password = register.Password,
-                CreatedDate = DateTime.Now.ToUniversalTime(),
+                CreatedDate = DateTime.UtcNow,
             };
 
             Result<User> result = await authRepository.RegisterUser(user);
@@ -67,7 +68,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         }
         catch
         {
-            return Result.Fail("An unknown error occurred. Please, connect to our support!");
+            return Result.Fail(ErrorMessage.Exception);
         }
     }
 }

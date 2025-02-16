@@ -24,6 +24,9 @@ public class AuthContext(DbContextOptions<AuthContext> options) : DbContext(opti
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
                     .HasColumnName("id");
+                entity.Property(e => e.Name)
+                    .HasMaxLength(64)
+                    .HasColumnName("name");
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");
                 entity.Property(e => e.ExpirationDate).HasColumnName("expiration_date");
                 entity.Property(e => e.UserId).HasColumnName("user_id");

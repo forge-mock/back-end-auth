@@ -1,3 +1,4 @@
+using Auth.Domain.Constants;
 using Auth.Domain.Models;
 using Auth.Domain.Models.Users;
 using Auth.Domain.Repositories;
@@ -23,7 +24,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
         catch
         {
-            return Result.Fail("An unknown error occurred. Please, connect to our support!");
+            return Result.Fail(ErrorMessage.Exception);
         }
     }
 
@@ -39,7 +40,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
         catch
         {
-            return Result.Fail("An unknown error occurred. Please, connect to our support!");
+            return Result.Fail(ErrorMessage.Exception);
         }
     }
 
@@ -53,11 +54,11 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
         catch
         {
-            return Result.Fail("An unknown error occurred. Please, connect to our support!");
+            return Result.Fail(ErrorMessage.Exception);
         }
     }
 
-    public Task<Token> RefreshToken(Guid userId)
+    public Task<Token> UpdateRefreshToken(Guid userId)
     {
         throw new NotImplementedException();
     }
