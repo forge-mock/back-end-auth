@@ -1,4 +1,5 @@
 using Auth.Application.DTOs;
+using Auth.Domain.Models;
 using Auth.Domain.Models.Users;
 using FluentResults;
 
@@ -8,7 +9,7 @@ public interface IAuthService
 {
     public Task<Result<UserIdentify>> Authenticate(LoginDto login);
 
-    public Task<Result<string>> Register(RegisterDto register, string refreshToken);
+    public Task<Result<Token>> Register(RegisterDto register, string refreshToken);
 
-    public Task<Result<string>> RefreshToken(string refreshToken);
+    public Task<Result<string>> RefreshToken(Guid userId, string refreshToken);
 }

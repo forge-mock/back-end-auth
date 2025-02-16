@@ -2,6 +2,7 @@ using Auth.Api.Rest.Interfaces;
 using Auth.Application.DTOs;
 using Auth.Application.DTOs.Results;
 using Auth.Application.Interfaces;
+using Auth.Domain.Models;
 using Auth.Domain.Models.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,12 @@ public class AuthController(IAuthService authService, ITokenService tokenService
         }
 
         string refreshToken = tokenService.GenerateRefreshToken();
+        Result<string> refreshTokenResult = await authService.RefreshToken(result.Value.Id, refreshToken);
+
+        if (refreshTokenResult.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(refreshTokenResult.IsSuccess, refreshTokenResult.Errors));
+        }
 
         return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
     }
@@ -38,13 +45,21 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     public async Task<IActionResult> Register([FromBody] RegisterDto register)
     {
         string refreshToken = tokenService.GenerateRefreshToken();
-        Result<string> result = await authService.Register(register, refreshToken);
+        Result<Token> result = await authService.Register(register, refreshToken);
 
         if (result.IsFailed)
         {
             return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
         }
 
-        return Ok(new ResultSuccessDto<string>(result.IsSuccess, result.Value));
+        UserIdentify user = new(result.Value.UserId, register.Username, register.UserEmail, register.Password);
+        Result<string> tokenResult = tokenService.GenerateToken(user);
+
+        if (tokenResult.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
+        }
+
+        return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
     }
 }

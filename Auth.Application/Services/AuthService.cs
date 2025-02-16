@@ -36,7 +36,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         }
     }
 
-    public async Task<Result<string>> Register(RegisterDto register, string refreshToken)
+    public async Task<Result<Token>> Register(RegisterDto register, string refreshToken)
     {
         try
         {
@@ -81,7 +81,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
 
             Result<Token> tokenResult = await authRepository.CreateRefreshToken(token);
 
-            return Result.Ok(tokenResult.Value.Name);
+            return Result.Ok(tokenResult.Value);
         }
         catch
         {
@@ -89,8 +89,34 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         }
     }
 
-    public Task<Result<string>> RefreshToken(string refreshToken)
+    public async Task<Result<string>> RefreshToken(Guid userId, string refreshToken)
     {
-        throw new NotImplementedException();
+        try
+        {
+            Token token = new()
+            {
+                Name = refreshToken,
+                CreatedDate = DateTime.UtcNow,
+                ExpirationDate = DateTime.UtcNow.AddDays(30),
+                UserId = userId,
+            };
+
+            Result<Guid> savedRefreshToken = await authRepository.GetRefreshToken(userId);
+
+            if (savedRefreshToken.IsFailed)
+            {
+                token.Id = Guid.NewGuid();
+                Result<Token> result = await authRepository.CreateRefreshToken(token);
+                return Result.Ok(result.Value.Name);
+            }
+
+            token.Id = savedRefreshToken.Value;
+            Result<Token> updateResult = await authRepository.UpdateRefreshToken(token);
+            return Result.Ok(updateResult.Value.Name);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
     }
 }

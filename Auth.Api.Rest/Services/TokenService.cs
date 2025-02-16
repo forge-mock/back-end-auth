@@ -54,6 +54,6 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
 
     public string GenerateRefreshToken()
     {
-        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
     }
 }

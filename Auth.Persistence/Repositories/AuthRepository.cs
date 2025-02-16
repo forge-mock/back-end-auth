@@ -58,6 +58,24 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
+    public async Task<Result<Guid>> GetRefreshToken(Guid userId)
+    {
+        try
+        {
+            Guid tokenId = await context.Tokens
+                .AsNoTracking()
+                .Where(t => t.UserId == userId)
+                .Select(t => t.Id)
+                .FirstOrDefaultAsync();
+
+            return tokenId == Guid.Empty ? Result.Fail("Token does not exist") : Result.Ok(tokenId);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
     public async Task<Result<Token>> CreateRefreshToken(Token token)
     {
         try
@@ -80,7 +98,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             await context.SaveChangesAsync();
             return Result.Ok(token);
         }
-        catch
+        catch (Exception ex)
         {
             return Result.Fail(ErrorMessage.Exception);
         }
