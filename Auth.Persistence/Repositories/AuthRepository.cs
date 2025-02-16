@@ -16,14 +16,14 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             UserIdentify? user = await context.Users
                 .AsNoTracking()
                 .Where(u => u.Username == userInput || u.UserEmail == userInput)
-                .Select(u => new UserIdentify(u.Username, u.UserEmail, u.Password))
+                .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password))
                 .FirstOrDefaultAsync();
 
             return user == null ? Result.Fail("User does not exist") : Result.Ok(user);
         }
-        catch (Exception ex)
+        catch
         {
-            return Result.Fail($"An error occurred: {ex.Message}");
+            return Result.Fail("An unknown error occurred. Please, connect to our support!");
         }
     }
 
@@ -37,9 +37,9 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
 
             return Result.Ok(userExists);
         }
-        catch (Exception ex)
+        catch
         {
-            return Result.Fail($"An error occurred: {ex.Message}");
+            return Result.Fail("An unknown error occurred. Please, connect to our support!");
         }
     }
 
@@ -51,9 +51,9 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             await context.SaveChangesAsync();
             return Result.Ok(user);
         }
-        catch (Exception ex)
+        catch
         {
-            return Result.Fail($"An error occurred: {ex.Message}");
+            return Result.Fail("An unknown error occurred. Please, connect to our support!");
         }
     }
 

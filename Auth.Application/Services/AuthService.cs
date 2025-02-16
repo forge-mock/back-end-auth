@@ -28,9 +28,9 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
 
             return isUserValid ? Result.Ok(result.Value) : Result.Fail("Username or password is incorrect");
         }
-        catch (Exception ex)
+        catch
         {
-            return Result.Fail($"An error occurred: {ex.Message}");
+            return Result.Fail("An unknown error occurred. Please, connect to our support!");
         }
     }
 
@@ -65,9 +65,9 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
 
             return result.IsFailed ? result : Result.Ok(result.Value);
         }
-        catch (Exception ex)
+        catch
         {
-            return Result.Fail($"An error occurred: {ex.Message}");
+            return Result.Fail("An unknown error occurred. Please, connect to our support!");
         }
     }
 }

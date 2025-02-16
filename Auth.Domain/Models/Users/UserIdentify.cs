@@ -1,7 +1,9 @@
 namespace Auth.Domain.Models.Users;
 
-public sealed class UserIdentify(string username, string userEmail, string password)
+public sealed class UserIdentify(Guid id, string username, string userEmail, string password)
 {
+    public Guid Id { get; set; } = id;
+
     public string Username { get; set; } = username;
 
     public string UserEmail { get; set; } = userEmail;

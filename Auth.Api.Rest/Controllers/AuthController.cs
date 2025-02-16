@@ -1,3 +1,4 @@
+using Auth.Api.Rest.Interfaces;
 using Auth.Application.DTOs;
 using Auth.Application.DTOs.Results;
 using Auth.Application.Interfaces;
@@ -9,7 +10,7 @@ namespace Auth.Api.Rest.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, ITokenService tokenService) : ControllerBase
 {
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] LoginDto login)
@@ -21,7 +22,14 @@ public class AuthController(IAuthService authService) : ControllerBase
             return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
         }
 
-        return Ok(new ResultSuccessDto<UserIdentify>(result.IsSuccess, result.Value));
+        Result<string> tokenResult = tokenService.GenerateToken(result.Value);
+
+        if (tokenResult.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
+        }
+
+        return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
     }
 
     [HttpPost("register")]

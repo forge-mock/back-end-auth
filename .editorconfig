@@ -18,6 +18,8 @@ tab_width = 4
 # Stylecop rules
 # XML comment analysis is disabled due to project configuration
 dotnet_diagnostic.SA0001.severity = none
+# The keyword 'new' should be followed by a space.
+dotnet_diagnostic.SA1000.severity = none
 # Closing parenthesis should not be followed by a space
 dotnet_diagnostic.SA1009.severity = none
 # Prefix local calls with this
