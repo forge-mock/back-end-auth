@@ -19,7 +19,7 @@ internal sealed class RegisterDtoValidator : AbstractValidator<RegisterDto>
 
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required")
-            .Matches(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
+            .Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$")
             .WithMessage("Password must be at least 8 characters and contain letters & numbers");
     }
 }
