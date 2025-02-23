@@ -1,10 +1,12 @@
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
+using Auth.Application.Services.Validators;
 using Auth.Domain.Constants;
 using Auth.Domain.Models.Tokens;
 using Auth.Domain.Models.Users;
 using Auth.Domain.Repositories;
 using FluentResults;
+using ValidationResult = FluentValidation.Results.ValidationResult;
 
 namespace Auth.Application.Services;
 
@@ -14,9 +16,13 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
     {
         try
         {
-            if (string.IsNullOrEmpty(login.UserInput) || string.IsNullOrEmpty(login.Password))
+            LoginDtoValidator validator = new();
+            ValidationResult validationResult = await validator.ValidateAsync(login);
+
+            if (!validationResult.IsValid)
             {
-                return Result.Fail("Username, user email or password are empty");
+                List<string> errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result.Fail(errors);
             }
 
             Result<UserIdentify> result = await authRepository.IdentifyUser(login.UserInput, login.Password);
@@ -40,11 +46,13 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
     {
         try
         {
-            if (string.IsNullOrEmpty(register.UserEmail) ||
-                string.IsNullOrEmpty(register.Username) ||
-                string.IsNullOrEmpty(register.Password))
+            RegisterDtoValidator validator = new();
+            ValidationResult validationResult = await validator.ValidateAsync(register);
+
+            if (!validationResult.IsValid)
             {
-                return Result.Fail("Username, user email and password should not be empty");
+                List<string> errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result.Fail(errors);
             }
 
             Result<bool> isUserExists = await authRepository.CheckIsUserExists(register.Username, register.UserEmail);
@@ -161,5 +169,4 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
             return Result.Fail(ErrorMessage.Exception);
         }
     }
-
 }
