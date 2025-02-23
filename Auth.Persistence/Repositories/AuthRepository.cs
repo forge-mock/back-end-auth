@@ -98,9 +98,15 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             await context.SaveChangesAsync();
             return Result.Ok(token);
         }
-        catch (Exception ex)
+        catch
         {
             return Result.Fail(ErrorMessage.Exception);
         }
+    }
+
+    public Result<bool> RemoveRefreshToken(Guid userId)
+    {
+        context.Tokens.Where(t => t.UserId == userId).ExecuteDeleteAsync();
+        return Result.Ok(true);
     }
 }

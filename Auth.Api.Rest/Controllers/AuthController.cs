@@ -114,6 +114,29 @@ public class AuthController(IAuthService authService, ITokenService tokenService
         return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
     }
 
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] string token)
+    {
+        string? refreshToken = Request.Cookies[RefreshTokenCookie];
+        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken);
+
+        if (validateResult.IsFailed)
+        {
+            return Unauthorized(new ResultFailDto(validateResult.IsSuccess, validateResult.Errors));
+        }
+
+        Guid userId = Guid.Parse(validateResult.Value[JwtRegisteredClaimNames.Sub]);
+
+        Result<bool> result = await authService.Logout(userId);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
+        }
+
+        return Ok(new ResultSuccessDto<bool>(result.IsSuccess, result.Value));
+    }
+
     private void SetRefreshTokenCookie(string refreshToken)
     {
         CookieOptions cookieOptions = new()

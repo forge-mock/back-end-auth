@@ -14,4 +14,6 @@ public interface IAuthService
     public Task<Result<bool>> ValidateRefreshToken(Guid userId, string refreshToken);
 
     public Task<Result<string>> RefreshToken(Guid userId, string refreshToken);
+
+    public Task<Result<bool>> Logout(Guid userId);
 }

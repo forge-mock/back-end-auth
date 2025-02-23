@@ -17,4 +17,6 @@ public interface IAuthRepository
     public Task<Result<Token>> CreateRefreshToken(Token token);
 
     public Task<Result<Token>> UpdateRefreshToken(Token token);
+
+    public Result<bool> RemoveRefreshToken(Guid userId);
 }

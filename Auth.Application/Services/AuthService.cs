@@ -140,4 +140,26 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
             return Result.Fail(ErrorMessage.Exception);
         }
     }
+
+    public async Task<Result<bool>> Logout(Guid userId)
+    {
+        try
+        {
+            Result<RefreshToken> refreshToken = await authRepository.GetRefreshToken(userId);
+
+            if (refreshToken.IsFailed)
+            {
+                return Result.Fail("Token does not exist");
+            }
+
+            Result<bool> result = authRepository.RemoveRefreshToken(userId);
+
+            return result;
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
 }
