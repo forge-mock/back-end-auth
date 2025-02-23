@@ -1,5 +1,5 @@
 using Auth.Domain.Constants;
-using Auth.Domain.Models;
+using Auth.Domain.Models.Tokens;
 using Auth.Domain.Models.Users;
 using Auth.Domain.Repositories;
 using Auth.Persistence.Context;
@@ -58,17 +58,17 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<Guid>> GetRefreshToken(Guid userId)
+    public async Task<Result<RefreshToken>> GetRefreshToken(Guid userId)
     {
         try
         {
-            Guid tokenId = await context.Tokens
+            RefreshToken? token = await context.Tokens
                 .AsNoTracking()
                 .Where(t => t.UserId == userId)
-                .Select(t => t.Id)
+                .Select(t => new RefreshToken(t.Id, t.Name))
                 .FirstOrDefaultAsync();
 
-            return tokenId == Guid.Empty ? Result.Fail("Token does not exist") : Result.Ok(tokenId);
+            return token == null || token.Id == Guid.Empty ? Result.Fail("Token does not exist") : Result.Ok(token);
         }
         catch
         {

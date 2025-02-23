@@ -1,4 +1,4 @@
-using Auth.Domain.Models;
+using Auth.Domain.Models.Tokens;
 using Auth.Domain.Models.Users;
 using FluentResults;
 
@@ -12,7 +12,7 @@ public interface IAuthRepository
 
     public Task<Result<bool>> CheckIsUserExists(string username, string userEmail);
 
-    public Task<Result<Guid>> GetRefreshToken(Guid userId);
+    public Task<Result<RefreshToken>> GetRefreshToken(Guid userId);
 
     public Task<Result<Token>> CreateRefreshToken(Token token);
 

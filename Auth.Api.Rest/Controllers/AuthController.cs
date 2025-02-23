@@ -2,10 +2,11 @@ using Auth.Api.Rest.Interfaces;
 using Auth.Application.DTOs;
 using Auth.Application.DTOs.Results;
 using Auth.Application.Interfaces;
-using Auth.Domain.Models;
+using Auth.Domain.Models.Tokens;
 using Auth.Domain.Models.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Auth.Api.Rest.Controllers;
 
@@ -13,6 +14,8 @@ namespace Auth.Api.Rest.Controllers;
 [Route("auth")]
 public class AuthController(IAuthService authService, ITokenService tokenService) : ControllerBase
 {
+    private const string RefreshTokenCookie = "refresh_token";
+
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] LoginDto login)
     {
@@ -67,6 +70,50 @@ public class AuthController(IAuthService authService, ITokenService tokenService
         return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
     }
 
+    [HttpPost("refresh_token")]
+    public async Task<IActionResult> RefreshToken([FromBody] string token)
+    {
+        string? refreshToken = Request.Cookies[RefreshTokenCookie];
+        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken);
+
+        if (validateResult.IsFailed)
+        {
+            return Unauthorized(new ResultFailDto(validateResult.IsSuccess, validateResult.Errors));
+        }
+
+        Guid userId = Guid.Parse(validateResult.Value[JwtRegisteredClaimNames.Sub]);
+        string username = validateResult.Value[JwtRegisteredClaimNames.Name];
+        string userEmail = validateResult.Value[JwtRegisteredClaimNames.Email];
+
+        Result<bool> validateRefreshTokenResult = await authService.ValidateRefreshToken(userId, refreshToken);
+
+        if (validateRefreshTokenResult.IsFailed)
+        {
+            return BadRequest(
+                new ResultFailDto(validateRefreshTokenResult.IsSuccess, validateRefreshTokenResult.Errors));
+        }
+
+        string updatedRefreshToken = tokenService.GenerateRefreshToken();
+        Result<string> result = await authService.RefreshToken(userId, updatedRefreshToken);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
+        }
+
+        UserIdentify user = new(userId, username, userEmail, string.Empty);
+        Result<string> tokenResult = tokenService.GenerateToken(user);
+
+        if (tokenResult.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
+        }
+
+        SetRefreshTokenCookie(updatedRefreshToken);
+
+        return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
+    }
+
     private void SetRefreshTokenCookie(string refreshToken)
     {
         CookieOptions cookieOptions = new()
@@ -77,6 +124,6 @@ public class AuthController(IAuthService authService, ITokenService tokenService
             Expires = DateTime.UtcNow.AddDays(30),
         };
 
-        Response.Cookies.Append("refresh_token", refreshToken, cookieOptions);
+        Response.Cookies.Append(RefreshTokenCookie, refreshToken, cookieOptions);
     }
 }

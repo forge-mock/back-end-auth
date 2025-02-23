@@ -1,7 +1,7 @@
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Domain.Constants;
-using Auth.Domain.Models;
+using Auth.Domain.Models.Tokens;
 using Auth.Domain.Models.Users;
 using Auth.Domain.Repositories;
 using FluentResults;
@@ -89,6 +89,27 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         }
     }
 
+    public async Task<Result<bool>> ValidateRefreshToken(Guid userId, string refreshToken)
+    {
+        try
+        {
+            Result<RefreshToken> savedRefreshToken = await authRepository.GetRefreshToken(userId);
+
+            if (savedRefreshToken.IsFailed)
+            {
+                return Result.Fail("Please, login again!");
+            }
+
+            bool validateToken = savedRefreshToken.Value.Name == refreshToken;
+
+            return Result.Ok(validateToken);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
     public async Task<Result<string>> RefreshToken(Guid userId, string refreshToken)
     {
         try
@@ -101,7 +122,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 UserId = userId,
             };
 
-            Result<Guid> savedRefreshToken = await authRepository.GetRefreshToken(userId);
+            Result<RefreshToken> savedRefreshToken = await authRepository.GetRefreshToken(userId);
 
             if (savedRefreshToken.IsFailed)
             {
@@ -110,7 +131,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 return Result.Ok(result.Value.Name);
             }
 
-            token.Id = savedRefreshToken.Value;
+            token.Id = savedRefreshToken.Value.Id;
             Result<Token> updateResult = await authRepository.UpdateRefreshToken(token);
             return Result.Ok(updateResult.Value.Name);
         }
