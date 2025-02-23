@@ -10,7 +10,7 @@ namespace Auth.Persistence.Repositories;
 
 public sealed class AuthRepository(AuthContext context) : IAuthRepository
 {
-    public async Task<Result<UserIdentify>> IdentifyUser(string userInput, string password)
+    public async Task<Result<UserIdentify>> IdentifyUser(string userInput)
     {
         try
         {

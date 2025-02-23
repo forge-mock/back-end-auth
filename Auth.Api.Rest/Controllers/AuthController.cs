@@ -70,7 +70,7 @@ public class AuthController(IAuthService authService, ITokenService tokenService
         return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
     }
 
-    [HttpPost("refresh_token")]
+    [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] string token)
     {
         string? refreshToken = Request.Cookies[RefreshTokenCookie];

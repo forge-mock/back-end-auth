@@ -25,16 +25,16 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 return Result.Fail(errors);
             }
 
-            Result<UserIdentify> result = await authRepository.IdentifyUser(login.UserInput, login.Password);
+            Result<UserIdentify> result = await authRepository.IdentifyUser(login.UserInput);
 
             if (result.IsFailed)
             {
                 return result;
             }
 
-            bool isUserValid = result.Value.Password == login.Password;
+            bool isPasswordValid = PasswordHasher.Verify(login.Password, result.Value.Password);
 
-            return isUserValid ? Result.Ok(result.Value) : Result.Fail("Username or password is incorrect");
+            return isPasswordValid ? Result.Ok(result.Value) : Result.Fail("Username or password is incorrect");
         }
         catch
         {
@@ -67,7 +67,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 Id = Guid.NewGuid(),
                 Username = register.Username,
                 UserEmail = register.UserEmail,
-                Password = register.Password,
+                Password = PasswordHasher.Hash(register.Password),
                 CreatedDate = DateTime.UtcNow,
             };
 

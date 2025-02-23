@@ -6,7 +6,7 @@ namespace Auth.Domain.Repositories;
 
 public interface IAuthRepository
 {
-    public Task<Result<UserIdentify>> IdentifyUser(string userInput, string password);
+    public Task<Result<UserIdentify>> IdentifyUser(string userInput);
 
     public Task<Result<User>> RegisterUser(User user);
 
