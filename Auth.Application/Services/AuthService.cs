@@ -103,7 +103,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
         {
             Result<RefreshToken> savedRefreshToken = await authRepository.GetRefreshToken(userId);
 
-            if (savedRefreshToken.IsFailed)
+            if (savedRefreshToken.IsFailed || savedRefreshToken.Value.ExpirationDate < DateTime.UtcNow)
             {
                 return Result.Fail("Please, login again!");
             }

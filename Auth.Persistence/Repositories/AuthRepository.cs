@@ -65,7 +65,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             RefreshToken? token = await context.Tokens
                 .AsNoTracking()
                 .Where(t => t.UserId == userId)
-                .Select(t => new RefreshToken(t.Id, t.Name))
+                .Select(t => new RefreshToken(t.Id, t.Name, t.ExpirationDate))
                 .FirstOrDefaultAsync();
 
             return token == null || token.Id == Guid.Empty ? Result.Fail("Token does not exist") : Result.Ok(token);

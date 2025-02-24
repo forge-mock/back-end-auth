@@ -87,10 +87,9 @@ public class AuthController(IAuthService authService, ITokenService tokenService
 
         Result<bool> validateRefreshTokenResult = await authService.ValidateRefreshToken(userId, refreshToken);
 
-        if (validateRefreshTokenResult.IsFailed)
+        if (!validateRefreshTokenResult.Value)
         {
-            return BadRequest(
-                new ResultFailDto(validateRefreshTokenResult.IsSuccess, validateRefreshTokenResult.Errors));
+            return BadRequest(new ResultFailDto(false, validateRefreshTokenResult.Errors));
         }
 
         string updatedRefreshToken = tokenService.GenerateRefreshToken();
