@@ -1,20 +1,41 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+## Pre-Installation process
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+Install needed tools:
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+1. .NET SDK from [Microsoft Official Page](https://dotnet.microsoft.com/en-us/download/dotnet/9.0). Need to be version
+   9.0 or above.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## Installation process
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+1. Clone the repository to your local machine.
+2. Open you IDE or Code Editor and navigate to the project folder.
+3. Create environment variables for DB Connection and JWT Secret:
+
+- For macOS in Terminal:
+
+```bash
+export JWT_SECRET=random_secret >> ~/.zshrc
+export AUTH_DB_CONNECTION_STRING="Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" >> ~/.zshrc
+source ~/.zshrc
+```
+
+- For Linux in Terminal:
+
+```bash
+export JWT_SECRET=random_secret >> ~/.bash_profile
+export AUTH_DB_CONNECTION_STRING="Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" >> ~/.bash_profile
+source ~/.bash_profile
+```
+
+- For Windows in Command Prompt:
+
+```bash
+setx JWT_SECRET "random_secret" /M
+setx AUTH_DB_CONNECTION_STRING "Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" /M
+```
+
+4. It's recommended to reload the terminal and restart the IDE.
+
+## Important notes
+
+1. Use SonarQube for IDE to keep the code clean and consistent.
