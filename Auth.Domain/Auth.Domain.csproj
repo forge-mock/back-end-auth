@@ -7,4 +7,16 @@
         <RootNamespace>Auth.Domain</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FluentResults" Version="3.16.0" />
+      <PackageReference Include="SonarAnalyzer.CSharp" Version="10.7.0.110445">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
 </Project>

@@ -74,7 +74,7 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     public async Task<IActionResult> RefreshToken([FromBody] string token)
     {
         string? refreshToken = Request.Cookies[RefreshTokenCookie];
-        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken);
+        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
         if (validateResult.IsFailed)
         {
@@ -85,7 +85,7 @@ public class AuthController(IAuthService authService, ITokenService tokenService
         string username = validateResult.Value[JwtRegisteredClaimNames.Name];
         string userEmail = validateResult.Value[JwtRegisteredClaimNames.Email];
 
-        Result<bool> validateRefreshTokenResult = await authService.ValidateRefreshToken(userId, refreshToken);
+        Result<bool> validateRefreshTokenResult = await authService.ValidateRefreshToken(userId, refreshToken ?? string.Empty);
 
         if (!validateRefreshTokenResult.Value)
         {
@@ -117,7 +117,7 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     public async Task<IActionResult> Logout([FromBody] string token)
     {
         string? refreshToken = Request.Cookies[RefreshTokenCookie];
-        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken);
+        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
         if (validateResult.IsFailed)
         {
