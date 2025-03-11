@@ -20,7 +20,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
                 .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password))
                 .FirstOrDefaultAsync();
 
-            return user == null ? Result.Fail("User does not exist") : Result.Ok(user);
+            return user == null ? Result.Fail("Username or password is incorrect") : Result.Ok(user);
         }
         catch
         {
