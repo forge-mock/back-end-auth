@@ -15,5 +15,6 @@ internal sealed class MiddlewareService : IMiddlewareService
         context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
         context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
         context.Response.Headers.Append("X-Forge-Mock-Auth", "Forge Mock Auth");
+        
     }
 }
