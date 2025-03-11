@@ -26,5 +26,7 @@ dotnet_diagnostic.SA1009.severity = none
 dotnet_diagnostic.SA1101.severity = none
 # Using directive should appear within a namespace declaration
 dotnet_diagnostic.SA1200.severity = none
+# Elements should not be separated by blank line
+dotnet_diagnostic.SA1516.severity = none
 # File header rule
 dotnet_diagnostic.SA1633.severity = none
