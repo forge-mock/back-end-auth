@@ -1,0 +1,40 @@
+name: Back-End PR
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+      - develop
+
+jobs:
+  analyze:
+    name: Analyze Code (StyleCop & SonarAnalyzer)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release /p:TreatWarningsAsErrors=true
+
+  docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: analyze
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t my-dotnet-api .
