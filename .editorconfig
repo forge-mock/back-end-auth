@@ -30,3 +30,5 @@ dotnet_diagnostic.SA1200.severity = none
 dotnet_diagnostic.SA1516.severity = none
 # File header rule
 dotnet_diagnostic.SA1633.severity = none
+# Content Security Policies should be restrictive to mitigate the risk of content injection attacks.
+dotnet_diagnostic.S7039.severity = none
