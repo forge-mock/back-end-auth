@@ -36,31 +36,23 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(
         options =>
             options.WithTheme(ScalarTheme.Purple).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.Http));
-    app.Use(
-        async (context, next) =>
-        {
-            IMiddlewareService middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
-            middlewareService.ConfigureHeaders(ref context);
-            await next();
-        });
 }
-else
-{
-    app.Use(
-        async (context, next) =>
-        {
-            if (!context.Request.Headers.ContainsKey(HttpHeaders.ForgeMockAuth) ||
-                !context.Request.Headers.ContainsKey(HttpHeaders.ContentType))
-            {
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                return;
-            }
 
-            IMiddlewareService middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
-            middlewareService.ConfigureHeaders(ref context);
-            await next();
-        });
-}
+app.Use(
+    async (context, next) =>
+    {
+        if ((!context.Request.Headers.ContainsKey(HttpHeaders.ForgeMockAuth) ||
+             !context.Request.Headers.ContainsKey(HttpHeaders.ContentType)) &&
+             !app.Environment.IsDevelopment())
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+
+        IMiddlewareService middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
+        middlewareService.ConfigureHeaders(ref context);
+        await next();
+    });
 
 app.UseCors("AllowDevelopment");
 app.UseHttpsRedirection();

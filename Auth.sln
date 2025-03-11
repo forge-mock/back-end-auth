@@ -8,7 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{3648B005-6
 		.gitignore = .gitignore
 		.editorconfig = .editorconfig
 		LICENSE = LICENSE
-		Directory.Build.props = Directory.Build.props
+		Dockerfile = Dockerfile
+		.dockerignore = .dockerignore
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain", "Auth.Domain\Auth.Domain.csproj", "{44773E22-52D1-4987-9B20-8B4697AB48DC}"
