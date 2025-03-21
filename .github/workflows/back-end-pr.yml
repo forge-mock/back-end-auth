@@ -1,11 +1,12 @@
 name: Back-End PR
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
       - staging
       - develop
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   analyze:
