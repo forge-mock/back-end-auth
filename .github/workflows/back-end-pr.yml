@@ -3,7 +3,6 @@ name: Back-End PR
 on:
   pull_request:
     branches:
-      - main
       - staging
       - develop
 
