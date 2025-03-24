@@ -1,0 +1,25 @@
+name: Checkov
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    branches:
+      - staging
+      - develop
+
+jobs:
+  checkov:
+    name: Run Checkov on Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Dockerfile
+        run: checkov --file Dockerfile
