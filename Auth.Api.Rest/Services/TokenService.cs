@@ -12,7 +12,7 @@ namespace Auth.Api.Rest.Services;
 
 public sealed class TokenService(IConfiguration configuration) : ITokenService
 {
-    private const string AuthErrorMessage = "Auth error occured. Please, connect to our support!";
+    private const string AuthErrorMessage = "Auth error occurred. Please, contact our support!";
     private const string JwtSecretEnvironmentVariable = "JWT_SECRET";
     private const string ExpirationTime = "Jwt:ExpirationTime";
     private const string Issuer = "Jwt:Issuer";
