@@ -1,4 +1,3 @@
-using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Extensions;
 using Auth.Api.Rest.Interfaces;
 using Auth.Persistence.Context;
@@ -11,18 +10,25 @@ builder.Services.AddOpenApi();
 builder.Services.AddCors(
     options =>
         options.AddPolicy(
-            "AllowDevelopment",
+            "Development",
             policy =>
             {
                 policy.WithOrigins("https://localhost:3000")
-                    .AllowAnyMethod()
                     .AllowCredentials()
-                    .WithHeaders(HttpHeaders.ForgeMockAuth, HttpHeaders.ForgeMockAuth);
+                    .WithMethods("GET", "POST")
+                    .WithHeaders("X-XSRF-TOKEN", "Content-Type");
             }));
-
-builder.Services.AddDbContext<AuthContext>(
+builder.Services.AddAntiforgery(
     options =>
-        options.UseNpgsql(Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION_STRING")));
+    {
+        options.HeaderName = "X-XSRF-TOKEN";
+        options.Cookie.Name = "XSRF-TOKEN-COOKIE";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
+builder.Services.AddDbContext<AuthContext>(
+    options => options.UseNpgsql(Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION_STRING")));
 builder.Services.AddControllers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();
@@ -34,27 +40,18 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference(
-        options =>
-            options.WithTheme(ScalarTheme.Purple).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.Http));
+        options => options.WithTheme(ScalarTheme.Purple).WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.Http));
 }
 
 app.Use(
     async (context, next) =>
     {
-        if ((!context.Request.Headers.ContainsKey(HttpHeaders.ForgeMockAuth) ||
-             !context.Request.Headers.ContainsKey(HttpHeaders.ContentType)) &&
-             !app.Environment.IsDevelopment())
-        {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            return;
-        }
-
         IMiddlewareService middlewareService = app.Services.GetRequiredService<IMiddlewareService>();
         middlewareService.ConfigureHeaders(ref context);
         await next();
     });
 
-app.UseCors("AllowDevelopment");
+app.UseCors("Development");
 app.UseHttpsRedirection();
 app.MapControllers();
 
