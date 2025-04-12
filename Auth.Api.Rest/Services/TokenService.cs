@@ -13,7 +13,7 @@ namespace Auth.Api.Rest.Services;
 public sealed class TokenService(IConfiguration configuration) : ITokenService
 {
     private const string AuthErrorMessage = "Auth error occured. Please, connect to our support!";
-    private const string JwtSecret = "JWT_SECRET";
+    private const string JwtSecretEnvironmentVariable = "JWT_SECRET";
     private const string ExpirationTime = "Jwt:ExpirationTime";
     private const string Issuer = "Jwt:Issuer";
     private const string Audience = "Jwt:Audience";
@@ -22,7 +22,7 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
     {
         try
         {
-            string? secretKey = Environment.GetEnvironmentVariable(JwtSecret);
+            string? secretKey = Environment.GetEnvironmentVariable(JwtSecretEnvironmentVariable);
 
             if (string.IsNullOrEmpty(secretKey))
             {
@@ -61,7 +61,7 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
     {
         try
         {
-            string? secretKey = Environment.GetEnvironmentVariable(JwtSecret);
+            string? secretKey = Environment.GetEnvironmentVariable(JwtSecretEnvironmentVariable);
 
             if (string.IsNullOrEmpty(secretKey) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(refreshToken))
             {
