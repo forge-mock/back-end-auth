@@ -1,10 +1,6 @@
 namespace Auth.Application.DTOs;
 
-public class RegisterDto
+public sealed class RegisterDto : LoginDto
 {
-    public string UserEmail { get; set; } = string.Empty;
-
     public string Username { get; set; } = string.Empty;
-
-    public string Password { get; set; } = string.Empty;
 }
