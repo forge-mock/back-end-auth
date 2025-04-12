@@ -15,8 +15,8 @@ builder.Services.AddCors(
             {
                 policy.WithOrigins("https://localhost:3000")
                     .AllowCredentials()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
+                    .WithMethods("GET", "POST")
+                    .WithHeaders("X-XSRF-TOKEN", "Content-Type");
             }));
 builder.Services.AddAntiforgery(
     options =>
