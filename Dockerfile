@@ -1,8 +1,19 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY . .
+COPY *.sln ./
+COPY Auth.Api.Rest/*.csproj ./Auth.Api.Rest/
+COPY Auth.Application/*.csproj ./Auth.Application/
+COPY Auth.Domain/*.csproj ./Auth.Domain/
+COPY Auth.Persistence/*.csproj ./Auth.Persistence/
+
 RUN dotnet restore
+
+COPY Auth.Api.Rest/ ./Auth.Api.Rest/
+COPY Auth.Application/ ./Auth.Application/
+COPY Auth.Domain/ ./Auth.Domain/
+COPY Auth.Persistence/ ./Auth.Persistence/
+
 WORKDIR /src/Auth.Api.Rest
 RUN dotnet publish -c Release -o /app --no-restore
 
