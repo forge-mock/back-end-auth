@@ -10,13 +10,13 @@ namespace Auth.Persistence.Repositories;
 
 public sealed class AuthRepository(AuthContext context) : IAuthRepository
 {
-    public async Task<Result<UserIdentify>> IdentifyUser(string userInput)
+    public async Task<Result<UserIdentify>> IdentifyUser(string userEmail)
     {
         try
         {
             UserIdentify? user = await context.Users
                 .AsNoTracking()
-                .Where(u => u.Username == userInput || u.UserEmail == userInput)
+                .Where(u => u.UserEmail == userEmail)
                 .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password))
                 .FirstOrDefaultAsync();
 

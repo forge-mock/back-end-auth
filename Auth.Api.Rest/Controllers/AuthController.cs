@@ -5,6 +5,7 @@ using Auth.Application.Interfaces;
 using Auth.Domain.Models.Tokens;
 using Auth.Domain.Models.Users;
 using FluentResults;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 
@@ -12,7 +13,8 @@ namespace Auth.Api.Rest.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController(IAuthService authService, ITokenService tokenService) : ControllerBase
+public class AuthController(IAntiforgery antiforgery, IAuthService authService, ITokenService tokenService)
+    : ControllerBase
 {
     private const string RefreshTokenCookie = "refresh_token";
 
@@ -73,8 +75,11 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] string token)
     {
+        await antiforgery.ValidateRequestAsync(HttpContext);
+
         string? refreshToken = Request.Cookies[RefreshTokenCookie];
-        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
+        Result<Dictionary<string, string>> validateResult =
+            await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
         if (validateResult.IsFailed)
         {
@@ -85,7 +90,8 @@ public class AuthController(IAuthService authService, ITokenService tokenService
         string username = validateResult.Value[JwtRegisteredClaimNames.Name];
         string userEmail = validateResult.Value[JwtRegisteredClaimNames.Email];
 
-        Result<bool> validateRefreshTokenResult = await authService.ValidateRefreshToken(userId, refreshToken ?? string.Empty);
+        Result<bool> validateRefreshTokenResult =
+            await authService.ValidateRefreshToken(userId, refreshToken ?? string.Empty);
 
         if (!validateRefreshTokenResult.Value)
         {
@@ -116,8 +122,11 @@ public class AuthController(IAuthService authService, ITokenService tokenService
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] string token)
     {
+        await antiforgery.ValidateRequestAsync(HttpContext);
+
         string? refreshToken = Request.Cookies[RefreshTokenCookie];
-        Result<Dictionary<string, string>> validateResult = await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
+        Result<Dictionary<string, string>> validateResult =
+            await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
         if (validateResult.IsFailed)
         {
