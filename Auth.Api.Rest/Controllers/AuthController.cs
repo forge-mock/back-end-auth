@@ -75,7 +75,14 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] string token)
     {
-        await antiforgery.ValidateRequestAsync(HttpContext);
+        try
+        {
+            await antiforgery.ValidateRequestAsync(HttpContext);
+        }
+        catch (AntiforgeryValidationException)
+        {
+            return BadRequest("Invalid CSRF token");
+        }
 
         string? refreshToken = Request.Cookies[RefreshTokenCookie];
         Result<Dictionary<string, string>> validateResult =
@@ -122,7 +129,14 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] string token)
     {
-        await antiforgery.ValidateRequestAsync(HttpContext);
+        try
+        {
+            await antiforgery.ValidateRequestAsync(HttpContext);
+        }
+        catch (AntiforgeryValidationException)
+        {
+            return BadRequest("Invalid CSRF token");
+        }
 
         string? refreshToken = Request.Cookies[RefreshTokenCookie];
         Result<Dictionary<string, string>> validateResult =
