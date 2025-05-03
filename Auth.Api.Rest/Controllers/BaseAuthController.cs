@@ -7,9 +7,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.Rest.Controllers;
 
+public class TokensDto(string accessToken, string refreshToken)
+{
+    public string AccessToken { get; set; } = accessToken;
+    public string RefreshToken { get; set; } = refreshToken;
+}
+
 public class BaseAuthController(ITokenService tokenService, IAuthService authService) : ControllerBase
 {
-    protected async Task<IActionResult> GenerateToken(UserIdentify user)
+    protected async Task<IActionResult> GenerateToken(UserIdentify user, bool inCookie = false)
     {
         Result<string> tokenResult = tokenService.GenerateToken(user);
 
@@ -26,9 +32,15 @@ public class BaseAuthController(ITokenService tokenService, IAuthService authSer
             return BadRequest(new ResultFailDto(refreshTokenResult.IsSuccess, refreshTokenResult.Errors));
         }
 
-        SetRefreshTokenCookie(refreshTokenResult.Value);
+        if (inCookie)
+        {
+            SetRefreshTokenCookie(refreshTokenResult.Value);
+            return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
+        }
 
-        return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
+        TokensDto tokens = new(tokenResult.Value, refreshTokenResult.Value);
+
+        return Ok(new ResultSuccessDto<TokensDto>(tokenResult.IsSuccess, tokens));
     }
 
     private void SetRefreshTokenCookie(string refreshToken)

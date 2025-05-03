@@ -25,7 +25,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
             return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
         }
 
-        return await GenerateToken(result.Value);
+        return await GenerateToken(result.Value, true);
     }
 
     [HttpPost("register")]
@@ -41,7 +41,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
 
         UserIdentify user = new(result.Value.UserId, register.Username, register.UserEmail, register.Password);
 
-        return await GenerateToken(user);
+        return await GenerateToken(user, true);
     }
 
     [HttpPost("refresh-token")]
@@ -72,7 +72,24 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
 
         UserIdentify user = new(userId, username, userEmail, string.Empty);
 
-        return await GenerateToken(user);
+        return await GenerateToken(user, true);
+    }
+
+    [HttpGet("clear-refresh-token")]
+    public NoContentResult ClearRefreshToken()
+    {
+        Response.Cookies.Append(
+            Cookies.RefreshToken,
+            string.Empty,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(-1),
+            });
+
+        return NoContent();
     }
 
     [HttpPost("logout")]
