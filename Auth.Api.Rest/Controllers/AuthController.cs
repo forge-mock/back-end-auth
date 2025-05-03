@@ -15,6 +15,9 @@ namespace Auth.Api.Rest.Controllers;
 public class AuthController(IAntiforgery antiforgery, IAuthService authService, ITokenService tokenService)
     : BaseAuthController(tokenService, authService)
 {
+    private readonly IAuthService authService = authService;
+    private readonly ITokenService tokenService = tokenService;
+
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] LoginDto login)
     {
