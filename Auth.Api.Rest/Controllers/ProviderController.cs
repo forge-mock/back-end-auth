@@ -1,6 +1,8 @@
+using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Interfaces;
 using Auth.Application.DTOs;
-using Auth.Application.DTOs.Results;
+using Auth.Application.Interfaces;
+using Auth.Domain.Models;
 using FluentResults;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +11,12 @@ namespace Auth.Api.Rest.Controllers;
 
 [ApiController]
 [Route("provider")]
-public class ProviderController(IProvidersService providersService) : ControllerBase
+public class ProviderController(
+    IProvidersService providersService,
+    ITokenService tokenService,
+    IAuthProviderService authProviderService,
+    IAuthService authService)
+    : BaseAuthController(tokenService, authService)
 {
     [HttpPost("google")]
     public async Task<IActionResult> Google([FromBody] string token)
@@ -21,31 +28,35 @@ public class ProviderController(IProvidersService providersService) : Controller
             return BadRequest(new ResultFailDto(payloadResult.IsSuccess, payloadResult.Errors));
         }
 
-        // // Step 2: Token is valid - process the user info (you can store in DB)
-        // var user = await _userRepository.FindOrCreateUserAsync(payload.Email, payload.Name);
-        //
-        // // Optionally, generate your own JWT here
-        // var jwt = GenerateYourJwt(user);
+        ProviderDto provider = new(payloadResult.Value.Name, payloadResult.Value.Email, token);
 
-        return Ok(new ResultSuccessDto<string>(payloadResult.IsSuccess, payloadResult.Value.Email));
+        return await BaseProvider(provider, Providers.Google);
     }
 
     [HttpPost("github")]
-    public async Task<IActionResult> GitHub([FromBody] GitHubDto gitHubDto)
+    public async Task<IActionResult> GitHub([FromBody] ProviderDto provider)
     {
-        Result<bool> gitHubResult = await providersService.VerifyGitHubToken(gitHubDto.AccessToken);
+        Result<bool> gitHubResult = await providersService.VerifyGitHubToken(provider.AccessToken);
 
         if (gitHubResult.IsFailed)
         {
             return BadRequest(new ResultFailDto(gitHubResult.IsSuccess, gitHubResult.Errors));
         }
 
-        // // Step 2: Token is valid - process the user info (you can store in DB)
-        // var user = await _userRepository.FindOrCreateUserAsync(payload.Email, payload.Name);
-        //
-        // // Optionally, generate your own JWT here
-        // var jwt = GenerateYourJwt(user);
+        return await BaseProvider(provider, Providers.GitHub);
+    }
 
-        return Ok(new ResultSuccessDto<string>(gitHubResult.IsSuccess, gitHubDto.AccessToken));
+    private async Task<IActionResult> BaseProvider(ProviderDto provider, string providerName)
+    {
+        Result<User> result = await authProviderService.FindProviderUser(provider, providerName);
+
+        if (result.IsFailed)
+        {
+            return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
+        }
+
+        UserIdentify user = new(result.Value.Id, result.Value.Username, result.Value.UserEmail, string.Empty);
+
+        return await GenerateToken(user);
     }
 }

@@ -27,16 +27,3 @@ public sealed class UserIdentify(Guid id, string username, string userEmail, str
 
     public string Password { get; set; } = password;
 }
-
-public sealed class ProviderUser
-{
-    public Guid Id { get; set; }
-
-    public string Username { get; set; } = string.Empty;
-
-    public string UserEmail { get; set; } = string.Empty;
-
-    public string AccessToken { get; set; } = string.Empty;
-
-    public DateTime CreatedDate { get; set; }
-}

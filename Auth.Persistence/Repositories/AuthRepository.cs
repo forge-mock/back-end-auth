@@ -27,13 +27,30 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<bool>> CheckIsUserExists(string username, string userEmail)
+    public async Task<Result<User>> FindUser(string userEmail)
+    {
+        try
+        {
+            User? user = await context.Users
+                .AsNoTracking()
+                .Where(u => u.UserEmail == userEmail)
+                .FirstOrDefaultAsync();
+
+            return user == null ? Result.Fail("User does not exist") : Result.Ok(user);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public async Task<Result<bool>> CheckIsUserExists(string userEmail)
     {
         try
         {
             bool userExists = await context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Username == username || u.UserEmail == userEmail);
+                .AnyAsync(u => u.UserEmail == userEmail);
 
             return Result.Ok(userExists);
         }
@@ -43,11 +60,25 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<User>> RegisterUser(User user)
+    public async Task<Result<User>> InsertUser(User user)
     {
         try
         {
             await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
+            return Result.Ok(user);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public async Task<Result<User>> UpdateUser(User user)
+    {
+        try
+        {
+            context.Users.Update(user);
             await context.SaveChangesAsync();
             return Result.Ok(user);
         }
@@ -107,5 +138,24 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
     {
         context.Tokens.Where(t => t.UserId == userId).ExecuteDeleteAsync();
         return Result.Ok(true);
+    }
+
+    public async Task<Result<OauthProvider>> GetOauthProvider(string name)
+    {
+        try
+        {
+            OauthProvider? oauthProvider = await context.OauthProviders
+                .AsNoTracking()
+                .Where(op => op.Name == name)
+                .FirstOrDefaultAsync();
+
+            return oauthProvider == null || oauthProvider.Id == Guid.Empty
+                ? Result.Fail("Provider does not exist")
+                : Result.Ok(oauthProvider);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
     }
 }

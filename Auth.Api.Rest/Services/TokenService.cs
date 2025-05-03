@@ -102,4 +102,15 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
             return Result.Fail(ErrorMessage.Exception);
         }
     }
+
+    public CookieOptions GetRefreshTokenCookieOptions()
+    {
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(30),
+        };
+    }
 }

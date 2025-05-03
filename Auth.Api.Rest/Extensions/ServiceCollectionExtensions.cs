@@ -12,6 +12,7 @@ internal static class ServiceCollectionExtensions
     internal static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthProviderService, AuthProviderService>();
     }
 
     internal static void AddRepositories(this IServiceCollection services)

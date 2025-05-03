@@ -15,7 +15,7 @@ public sealed class Token
     public User User { get; set; } = null!;
 }
 
-public class RefreshToken(Guid id, string name, DateTime expirationDate)
+public sealed class RefreshToken(Guid id, string name, DateTime expirationDate)
 {
     public Guid Id { get; set; } = id;
 

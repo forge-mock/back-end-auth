@@ -10,4 +10,6 @@ public interface ITokenService
     public Task<Result<Dictionary<string, string>>> ValidateToken(string token, string refreshToken);
 
     public string GenerateRefreshToken();
+
+    public CookieOptions GetRefreshTokenCookieOptions();
 }

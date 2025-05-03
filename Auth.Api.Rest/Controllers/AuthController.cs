@@ -1,6 +1,6 @@
+using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Interfaces;
 using Auth.Application.DTOs;
-using Auth.Application.DTOs.Results;
 using Auth.Application.Interfaces;
 using Auth.Domain.Models;
 using FluentResults;
@@ -13,10 +13,8 @@ namespace Auth.Api.Rest.Controllers;
 [ApiController]
 [Route("auth")]
 public class AuthController(IAntiforgery antiforgery, IAuthService authService, ITokenService tokenService)
-    : ControllerBase
+    : BaseAuthController(tokenService, authService)
 {
-    private const string RefreshTokenCookie = "refresh_token";
-
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] LoginDto login)
     {
@@ -27,24 +25,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
             return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
         }
 
-        Result<string> tokenResult = tokenService.GenerateToken(result.Value);
-
-        if (tokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
-        }
-
-        string refreshToken = tokenService.GenerateRefreshToken();
-        Result<string> refreshTokenResult = await authService.RefreshToken(result.Value.Id, refreshToken);
-
-        if (refreshTokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(refreshTokenResult.IsSuccess, refreshTokenResult.Errors));
-        }
-
-        SetRefreshTokenCookie(refreshTokenResult.Value);
-
-        return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
+        return await GenerateToken(result.Value);
     }
 
     [HttpPost("register")]
@@ -59,16 +40,8 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
         }
 
         UserIdentify user = new(result.Value.UserId, register.Username, register.UserEmail, register.Password);
-        Result<string> tokenResult = tokenService.GenerateToken(user);
 
-        if (tokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
-        }
-
-        SetRefreshTokenCookie(refreshToken);
-
-        return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
+        return await GenerateToken(user);
     }
 
     [HttpPost("refresh-token")]
@@ -76,7 +49,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
     {
         await antiforgery.ValidateRequestAsync(HttpContext);
 
-        string? refreshToken = Request.Cookies[RefreshTokenCookie];
+        string? refreshToken = Request.Cookies[Cookies.RefreshToken];
         Result<Dictionary<string, string>> validateResult =
             await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
@@ -97,25 +70,9 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
             return BadRequest(new ResultFailDto(false, validateRefreshTokenResult.Errors));
         }
 
-        string updatedRefreshToken = tokenService.GenerateRefreshToken();
-        Result<string> result = await authService.RefreshToken(userId, updatedRefreshToken);
-
-        if (result.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
-        }
-
         UserIdentify user = new(userId, username, userEmail, string.Empty);
-        Result<string> tokenResult = tokenService.GenerateToken(user);
 
-        if (tokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
-        }
-
-        SetRefreshTokenCookie(updatedRefreshToken);
-
-        return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
+        return await GenerateToken(user);
     }
 
     [HttpPost("logout")]
@@ -123,7 +80,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
     {
         await antiforgery.ValidateRequestAsync(HttpContext);
 
-        string? refreshToken = Request.Cookies[RefreshTokenCookie];
+        string? refreshToken = Request.Cookies[Cookies.RefreshToken];
         Result<Dictionary<string, string>> validateResult =
             await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
@@ -142,18 +99,5 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
         }
 
         return Ok(new ResultSuccessDto<bool>(result.IsSuccess, result.Value));
-    }
-
-    private void SetRefreshTokenCookie(string refreshToken)
-    {
-        CookieOptions cookieOptions = new()
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(30),
-        };
-
-        Response.Cookies.Append(RefreshTokenCookie, refreshToken, cookieOptions);
     }
 }

@@ -54,11 +54,11 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 return Result.Fail(errors);
             }
 
-            Result<bool> isUserExists = await authRepository.CheckIsUserExists(register.Username, register.UserEmail);
+            Result<bool> isUserExists = await authRepository.CheckIsUserExists(register.UserEmail);
 
             if (isUserExists.Value)
             {
-                return Result.Fail("User already exists. Please, change username or email");
+                return Result.Fail("User already exists. Please, change email");
             }
 
             User user = new()
@@ -70,7 +70,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 CreatedDate = DateTime.UtcNow,
             };
 
-            Result<User> result = await authRepository.RegisterUser(user);
+            Result<User> result = await authRepository.InsertUser(user);
 
             if (result.IsFailed)
             {
