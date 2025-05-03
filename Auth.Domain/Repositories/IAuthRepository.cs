@@ -1,5 +1,4 @@
-using Auth.Domain.Models.Tokens;
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using FluentResults;
 
 namespace Auth.Domain.Repositories;

@@ -1,6 +1,5 @@
 using Auth.Domain.Constants;
-using Auth.Domain.Models.Tokens;
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using Auth.Domain.Repositories;
 using Auth.Persistence.Context;
 using FluentResults;

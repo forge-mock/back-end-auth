@@ -1,4 +1,4 @@
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using FluentResults;
 
 namespace Auth.Api.Rest.Interfaces;
