@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Auth.Api.Rest.Interfaces;
 using Auth.Domain.Constants;
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using FluentResults;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -17,45 +17,6 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
     private const string ExpirationTime = "Jwt:ExpirationTime";
     private const string Issuer = "Jwt:Issuer";
     private const string Audience = "Jwt:Audience";
-
-    public Result<string> GenerateToken(UserIdentify user)
-    {
-        try
-        {
-            string? secretKey = Environment.GetEnvironmentVariable(JwtSecretEnvironmentVariable);
-
-            if (string.IsNullOrEmpty(secretKey))
-            {
-                return Result.Fail(AuthErrorMessage);
-            }
-
-            SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(secretKey));
-            SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
-            SecurityTokenDescriptor tokenDescriptor = new()
-            {
-                Subject = new ClaimsIdentity(
-                [
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Name, user.Username),
-                    new Claim(JwtRegisteredClaimNames.Email, user.UserEmail),
-                ]),
-                Expires = DateTime.UtcNow
-                    .AddMinutes(configuration.GetValue<int>(ExpirationTime)),
-                SigningCredentials = credentials,
-                Issuer = configuration[Issuer],
-                Audience = configuration[Audience],
-            };
-
-            JsonWebTokenHandler tokenHandler = new();
-            string jwtToken = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Result.Ok(jwtToken);
-        }
-        catch
-        {
-            return Result.Fail(ErrorMessage.Exception);
-        }
-    }
 
     public async Task<Result<Dictionary<string, string>>> ValidateToken(string token, string refreshToken)
     {
@@ -101,5 +62,55 @@ public sealed class TokenService(IConfiguration configuration) : ITokenService
     public string GenerateRefreshToken()
     {
         return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+    }
+
+    public Result<string> GenerateToken(UserIdentify user)
+    {
+        try
+        {
+            string? secretKey = Environment.GetEnvironmentVariable(JwtSecretEnvironmentVariable);
+
+            if (string.IsNullOrEmpty(secretKey))
+            {
+                return Result.Fail(AuthErrorMessage);
+            }
+
+            SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(secretKey));
+            SigningCredentials credentials = new(securityKey, SecurityAlgorithms.HmacSha256);
+            SecurityTokenDescriptor tokenDescriptor = new()
+            {
+                Subject = new ClaimsIdentity(
+                [
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Name, user.Username),
+                    new Claim(JwtRegisteredClaimNames.Email, user.UserEmail),
+                ]),
+                Expires = DateTime.UtcNow
+                    .AddMinutes(configuration.GetValue<int>(ExpirationTime)),
+                SigningCredentials = credentials,
+                Issuer = configuration[Issuer],
+                Audience = configuration[Audience],
+            };
+
+            JsonWebTokenHandler tokenHandler = new();
+            string jwtToken = tokenHandler.CreateToken(tokenDescriptor);
+
+            return Result.Ok(jwtToken);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public CookieOptions GetRefreshTokenCookieOptions()
+    {
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(30),
+        };
     }
 }

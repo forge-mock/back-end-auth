@@ -9,32 +9,13 @@ Install needed tools:
 
 1. Clone the repository to your local machine.
 2. Open you IDE or Code Editor and navigate to the project folder.
-3. Create environment variables for DB Connection and JWT Secret:
+3. Create .env file in the root folder and add environment variables:
 
-- For macOS in Terminal:
-
-```bash
-export JWT_SECRET=random_secret >> ~/.zshrc
-export AUTH_DB_CONNECTION_STRING="Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" >> ~/.zshrc
-source ~/.zshrc
 ```
-
-- For Linux in Terminal:
-
-```bash
-export JWT_SECRET=random_secret >> ~/.bash_profile
-export AUTH_DB_CONNECTION_STRING="Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" >> ~/.bash_profile
-source ~/.bash_profile
+JWT_SECRET=random_secret
+USER_IDENTITY_DB_CONNECTION_STRING=Host=database_ip;Port=5432;Database=user_identity;Username=username;Password=password;
+GOOGLE_CLIENT_ID=client_id
 ```
-
-- For Windows in Command Prompt:
-
-```bash
-setx JWT_SECRET "random_secret" /M
-setx AUTH_DB_CONNECTION_STRING "Host=database_ip;Port=5432;Database=auth;Username=username;Password=password;" /M
-```
-
-4. It's recommended to reload the terminal and restart the IDE.
 
 ## Important notes
 

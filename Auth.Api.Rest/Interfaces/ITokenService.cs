@@ -1,4 +1,4 @@
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using FluentResults;
 
 namespace Auth.Api.Rest.Interfaces;
@@ -10,4 +10,6 @@ public interface ITokenService
     public Task<Result<Dictionary<string, string>>> ValidateToken(string token, string refreshToken);
 
     public string GenerateRefreshToken();
+
+    public CookieOptions GetRefreshTokenCookieOptions();
 }
