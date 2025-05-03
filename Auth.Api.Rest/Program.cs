@@ -7,7 +7,7 @@ using Scalar.AspNetCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
+Env.Load("../.env");
 
 builder.Services.AddOpenApi();
 builder.Services.AddCors(options =>
@@ -29,7 +29,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 builder.Services.AddDbContext<AuthContext>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("AUTH_DB_CONNECTION_STRING")));
+    options.UseNpgsql(Environment.GetEnvironmentVariable("USER_IDENTITY_DB_CONNECTION_STRING")));
 builder.Services.AddControllers();
 builder.Services.AddRepositories();
 builder.Services.AddApplicationServices();

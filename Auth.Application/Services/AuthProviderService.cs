@@ -77,9 +77,7 @@ public sealed class AuthProviderService(IAuthRepository authRepository) : IAuthP
                 return Result.Fail(oauthProvider.Errors);
             }
 
-            user.Providers.Add(oauthProvider.Value);
-
-            Result<User> result = await authRepository.UpdateUser(user);
+            Result<User> result = await authRepository.UpdateUserProvider(user, oauthProvider.Value);
             return Result.Ok(result.Value);
         }
         catch

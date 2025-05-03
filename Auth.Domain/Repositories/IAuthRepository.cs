@@ -11,8 +11,6 @@ public interface IAuthRepository
 
     public Task<Result<User>> InsertUser(User user);
 
-    public Task<Result<User>> UpdateUser(User user);
-
     public Task<Result<bool>> CheckIsUserExists(string userEmail);
 
     public Task<Result<RefreshToken>> GetRefreshToken(Guid userId);
@@ -24,4 +22,6 @@ public interface IAuthRepository
     public Result<bool> RemoveRefreshToken(Guid userId);
 
     public Task<Result<OauthProvider>> GetOauthProvider(string name);
+
+    public Task<Result<User>> UpdateUserProvider(User user, OauthProvider provider);
 }

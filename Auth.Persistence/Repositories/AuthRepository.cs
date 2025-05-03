@@ -32,9 +32,8 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         try
         {
             User? user = await context.Users
-                .AsNoTracking()
-                .Where(u => u.UserEmail == userEmail)
-                .FirstOrDefaultAsync();
+                .Include(u => u.Providers)
+                .FirstOrDefaultAsync(u => u.UserEmail == userEmail);
 
             return user == null ? Result.Fail("User does not exist") : Result.Ok(user);
         }
@@ -65,20 +64,6 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         try
         {
             await context.Users.AddAsync(user);
-            await context.SaveChangesAsync();
-            return Result.Ok(user);
-        }
-        catch
-        {
-            return Result.Fail(ErrorMessage.Exception);
-        }
-    }
-
-    public async Task<Result<User>> UpdateUser(User user)
-    {
-        try
-        {
-            context.Users.Update(user);
             await context.SaveChangesAsync();
             return Result.Ok(user);
         }
@@ -152,6 +137,21 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             return oauthProvider == null || oauthProvider.Id == Guid.Empty
                 ? Result.Fail("Provider does not exist")
                 : Result.Ok(oauthProvider);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public async Task<Result<User>> UpdateUserProvider(User user, OauthProvider provider)
+    {
+        try
+        {
+            context.Attach(provider);
+            user.Providers.Add(provider);
+            await context.SaveChangesAsync();
+            return Result.Ok(user);
         }
         catch
         {
