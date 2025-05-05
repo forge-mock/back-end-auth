@@ -11,6 +11,8 @@ public class AuthContext(DbContextOptions<AuthContext> options) : DbContext(opti
 
     public virtual DbSet<OauthProvider> OauthProviders { get; set; }
 
+    public virtual DbSet<UserOauthProvider> UserOauthProviders { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasPostgresExtension("uuid-ossp");
@@ -74,23 +76,27 @@ public class AuthContext(DbContextOptions<AuthContext> options) : DbContext(opti
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .HasColumnName("username");
+        });
 
-            entity.HasMany(d => d.Providers).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserOauthProvider",
-                    r => r.HasOne<OauthProvider>().WithMany()
-                        .HasForeignKey("ProviderId")
-                        .HasConstraintName("user_oauth_provider_provider_id_fkey"),
-                    l => l.HasOne<User>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("user_oauth_provider_user_id_fkey"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "ProviderId").HasName("user_oauth_provider_pkey");
-                        j.ToTable("user_oauth_provider");
-                        j.IndexerProperty<Guid>("UserId").HasColumnName("user_id");
-                        j.IndexerProperty<Guid>("ProviderId").HasColumnName("provider_id");
-                    });
+        modelBuilder.Entity<UserOauthProvider>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.ProviderId }).HasName("user_oauth_provider_pkey");
+
+            entity.ToTable("user_oauth_provider");
+
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ProviderId).HasColumnName("provider_id");
+            entity.Property(e => e.ProviderAccountId)
+                .HasMaxLength(40)
+                .HasColumnName("provider_account_id");
+
+            entity.HasOne(d => d.Provider).WithMany(p => p.UserOauthProviders)
+                .HasForeignKey(d => d.ProviderId)
+                .HasConstraintName("user_oauth_provider_provider_id_fkey");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserOauthProviders)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("user_oauth_provider_user_id_fkey");
         });
     }
 }

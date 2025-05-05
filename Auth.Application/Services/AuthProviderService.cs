@@ -13,7 +13,12 @@ public sealed class AuthProviderService(IAuthRepository authRepository) : IAuthP
     {
         try
         {
-            Result<User> result = await authRepository.FindUser(provider.UserEmail);
+            Result<User> result = await authRepository.FindUserWithProvider(provider.UserEmail);
+
+            if (result.Value.UserOauthProviders.Any(p => p.ProviderAccountId == provider.ProviderAccountId))
+            {
+                return result;
+            }
 
             if (result.IsFailed)
             {
@@ -22,12 +27,12 @@ public sealed class AuthProviderService(IAuthRepository authRepository) : IAuthP
                 return addResult.IsFailed ? Result.Fail(addResult.Errors) : addResult;
             }
 
-            if (result.Value.Providers.Any(p => p.Name == providerName))
+            if (result.Value.UserOauthProviders.Any(p => p.Provider.Name == providerName))
             {
                 return result;
             }
 
-            Result<User> updateResult = await UpdateProviderUser(result.Value, providerName);
+            Result<User> updateResult = await UpdateProviderUser(result.Value, provider, providerName);
 
             return updateResult.IsSuccess ? Result.Ok(result.Value) : Result.Fail(updateResult.Errors);
         }
@@ -48,13 +53,24 @@ public sealed class AuthProviderService(IAuthRepository authRepository) : IAuthP
                 return Result.Fail(oauthProvider.Errors);
             }
 
+            Guid newUserId = Guid.NewGuid();
+
             User user = new()
             {
-                Id = Guid.NewGuid(),
+                Id = newUserId,
                 Username = provider.Username,
                 UserEmail = provider.UserEmail,
                 CreatedDate = DateTime.Now,
-                Providers = new List<OauthProvider> { oauthProvider.Value },
+                UserOauthProviders = new List<UserOauthProvider>
+                {
+                    new()
+                    {
+                        UserId = newUserId,
+                        Provider = oauthProvider.Value,
+                        ProviderId = oauthProvider.Value.Id,
+                        ProviderAccountId = provider.ProviderAccountId,
+                    },
+                },
             };
 
             Result<User> result = await authRepository.InsertUser(user);
@@ -66,7 +82,7 @@ public sealed class AuthProviderService(IAuthRepository authRepository) : IAuthP
         }
     }
 
-    private async Task<Result<User>> UpdateProviderUser(User user, string providerName)
+    private async Task<Result<User>> UpdateProviderUser(User user, ProviderDto provider, string providerName)
     {
         try
         {
@@ -77,7 +93,15 @@ public sealed class AuthProviderService(IAuthRepository authRepository) : IAuthP
                 return Result.Fail(oauthProvider.Errors);
             }
 
-            Result<User> result = await authRepository.UpdateUserProvider(user, oauthProvider.Value);
+            UserOauthProvider userProvider = new()
+            {
+                UserId = user.Id,
+                Provider = oauthProvider.Value,
+                ProviderId = oauthProvider.Value.Id,
+                ProviderAccountId = provider.ProviderAccountId,
+            };
+
+            Result<User> result = await authRepository.UpdateUserProvider(user, userProvider);
             return Result.Ok(result.Value);
         }
         catch

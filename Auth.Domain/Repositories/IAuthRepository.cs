@@ -7,7 +7,7 @@ public interface IAuthRepository
 {
     public Task<Result<UserIdentify>> IdentifyUser(string userEmail);
 
-    public Task<Result<User>> FindUser(string userEmail);
+    public Task<Result<User>> FindUserWithProvider(string userEmail);
 
     public Task<Result<User>> InsertUser(User user);
 
@@ -23,5 +23,5 @@ public interface IAuthRepository
 
     public Task<Result<OauthProvider>> GetOauthProvider(string name);
 
-    public Task<Result<User>> UpdateUserProvider(User user, OauthProvider provider);
+    public Task<Result<User>> UpdateUserProvider(User user, UserOauthProvider provider);
 }

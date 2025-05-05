@@ -8,13 +8,13 @@ public sealed class User
 
     public string UserEmail { get; set; } = null!;
 
-    public string Password { get; set; } = string.Empty;
+    public string? Password { get; set; }
 
     public DateTime CreatedDate { get; set; }
 
     public ICollection<Token> Tokens { get; set; } = new List<Token>();
 
-    public ICollection<OauthProvider> Providers { get; set; } = new List<OauthProvider>();
+    public ICollection<UserOauthProvider> UserOauthProviders { get; set; } = new List<UserOauthProvider>();
 }
 
 public sealed class UserIdentify(Guid id, string username, string userEmail, string password)

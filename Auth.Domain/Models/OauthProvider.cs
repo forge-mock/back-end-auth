@@ -6,5 +6,5 @@ public sealed class OauthProvider
 
     public string Name { get; set; } = null!;
 
-    public ICollection<User> Users { get; set; } = new List<User>();
+    public ICollection<UserOauthProvider> UserOauthProviders { get; set; } = new List<UserOauthProvider>();
 }
