@@ -16,7 +16,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             UserIdentify? user = await context.Users
                 .AsNoTracking()
                 .Where(u => u.UserEmail == userEmail)
-                .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password))
+                .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password ?? string.Empty))
                 .FirstOrDefaultAsync();
 
             return user == null ? Result.Fail("Username or password is incorrect") : Result.Ok(user);
@@ -27,12 +27,13 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<User>> FindUser(string userEmail)
+    public async Task<Result<User>> FindUserWithProvider(string userEmail)
     {
         try
         {
             User? user = await context.Users
-                .Include(u => u.Providers)
+                .Include(u => u.UserOauthProviders)
+                .ThenInclude(p => p.Provider)
                 .FirstOrDefaultAsync(u => u.UserEmail == userEmail);
 
             return user == null ? Result.Fail("User does not exist") : Result.Ok(user);
@@ -144,12 +145,12 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<User>> UpdateUserProvider(User user, OauthProvider provider)
+    public async Task<Result<User>> UpdateUserProvider(User user, UserOauthProvider provider)
     {
         try
         {
-            context.Attach(provider);
-            user.Providers.Add(provider);
+            context.Attach(provider.Provider);
+            context.UserOauthProviders.Add(provider);
             await context.SaveChangesAsync();
             return Result.Ok(user);
         }

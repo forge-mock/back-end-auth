@@ -19,16 +19,15 @@ public class ProviderController(
     : BaseAuthController(tokenService, authService)
 {
     [HttpPost("google")]
-    public async Task<IActionResult> Google([FromBody] string token)
+    public async Task<IActionResult> Google([FromBody] ProviderDto provider)
     {
-        Result<GoogleJsonWebSignature.Payload> payloadResult = await providersService.VerifyGoogleToken(token);
+        Result<GoogleJsonWebSignature.Payload> payloadResult =
+            await providersService.VerifyGoogleToken(provider.AccessToken);
 
         if (payloadResult.IsFailed)
         {
             return BadRequest(new ResultFailDto(payloadResult.IsSuccess, payloadResult.Errors));
         }
-
-        ProviderDto provider = new(payloadResult.Value.Name, payloadResult.Value.Email, token);
 
         return await BaseProvider(provider, Providers.Google);
     }
