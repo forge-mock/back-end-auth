@@ -1,6 +1,4 @@
-﻿using Auth.Domain.Models.Users;
-
-namespace Auth.Domain.Models.Tokens;
+﻿namespace Auth.Domain.Models;
 
 public sealed class Token
 {
@@ -15,4 +13,13 @@ public sealed class Token
     public Guid UserId { get; set; }
 
     public User User { get; set; } = null!;
+}
+
+public sealed class RefreshToken(Guid id, string name, DateTime expirationDate)
+{
+    public Guid Id { get; set; } = id;
+
+    public string Name { get; set; } = name;
+
+    public DateTime ExpirationDate { get; set; } = expirationDate;
 }

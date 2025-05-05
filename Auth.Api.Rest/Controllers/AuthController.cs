@@ -1,9 +1,8 @@
+using Auth.Api.Rest.Constants;
 using Auth.Api.Rest.Interfaces;
 using Auth.Application.DTOs;
-using Auth.Application.DTOs.Results;
 using Auth.Application.Interfaces;
-using Auth.Domain.Models.Tokens;
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using FluentResults;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +13,10 @@ namespace Auth.Api.Rest.Controllers;
 [ApiController]
 [Route("auth")]
 public class AuthController(IAntiforgery antiforgery, IAuthService authService, ITokenService tokenService)
-    : ControllerBase
+    : BaseAuthController(tokenService, authService)
 {
-    private const string RefreshTokenCookie = "refresh_token";
+    private readonly IAuthService authService = authService;
+    private readonly ITokenService tokenService = tokenService;
 
     [HttpPost("authenticate")]
     public async Task<IActionResult> Authenticate([FromBody] LoginDto login)
@@ -28,24 +28,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
             return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
         }
 
-        Result<string> tokenResult = tokenService.GenerateToken(result.Value);
-
-        if (tokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
-        }
-
-        string refreshToken = tokenService.GenerateRefreshToken();
-        Result<string> refreshTokenResult = await authService.RefreshToken(result.Value.Id, refreshToken);
-
-        if (refreshTokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(refreshTokenResult.IsSuccess, refreshTokenResult.Errors));
-        }
-
-        SetRefreshTokenCookie(refreshTokenResult.Value);
-
-        return Ok(new ResultSuccessDto<string>(tokenResult.IsSuccess, tokenResult.Value));
+        return await GenerateToken(result.Value, true);
     }
 
     [HttpPost("register")]
@@ -60,24 +43,23 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
         }
 
         UserIdentify user = new(result.Value.UserId, register.Username, register.UserEmail, register.Password);
-        Result<string> tokenResult = tokenService.GenerateToken(user);
 
-        if (tokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
-        }
-
-        SetRefreshTokenCookie(refreshToken);
-
-        return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
+        return await GenerateToken(user, true);
     }
 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] string token)
     {
-        await antiforgery.ValidateRequestAsync(HttpContext);
+        try
+        {
+            await antiforgery.ValidateRequestAsync(HttpContext);
+        }
+        catch (AntiforgeryValidationException)
+        {
+            return BadRequest("Invalid CSRF token");
+        }
 
-        string? refreshToken = Request.Cookies[RefreshTokenCookie];
+        string? refreshToken = Request.Cookies[Cookies.RefreshToken];
         Result<Dictionary<string, string>> validateResult =
             await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
@@ -98,33 +80,41 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
             return BadRequest(new ResultFailDto(false, validateRefreshTokenResult.Errors));
         }
 
-        string updatedRefreshToken = tokenService.GenerateRefreshToken();
-        Result<string> result = await authService.RefreshToken(userId, updatedRefreshToken);
-
-        if (result.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(result.IsSuccess, result.Errors));
-        }
-
         UserIdentify user = new(userId, username, userEmail, string.Empty);
-        Result<string> tokenResult = tokenService.GenerateToken(user);
 
-        if (tokenResult.IsFailed)
-        {
-            return BadRequest(new ResultFailDto(tokenResult.IsSuccess, tokenResult.Errors));
-        }
+        return await GenerateToken(user, true);
+    }
 
-        SetRefreshTokenCookie(updatedRefreshToken);
+    [HttpGet("clear-refresh-token")]
+    public NoContentResult ClearRefreshToken()
+    {
+        Response.Cookies.Append(
+            Cookies.RefreshToken,
+            string.Empty,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(-1),
+            });
 
-        return Ok(new ResultSuccessDto<string>(result.IsSuccess, tokenResult.Value));
+        return NoContent();
     }
 
     [HttpPost("logout")]
     public async Task<IActionResult> Logout([FromBody] string token)
     {
-        await antiforgery.ValidateRequestAsync(HttpContext);
+        try
+        {
+            await antiforgery.ValidateRequestAsync(HttpContext);
+        }
+        catch (AntiforgeryValidationException)
+        {
+            return BadRequest("Invalid CSRF token");
+        }
 
-        string? refreshToken = Request.Cookies[RefreshTokenCookie];
+        string? refreshToken = Request.Cookies[Cookies.RefreshToken];
         Result<Dictionary<string, string>> validateResult =
             await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
 
@@ -143,18 +133,5 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
         }
 
         return Ok(new ResultSuccessDto<bool>(result.IsSuccess, result.Value));
-    }
-
-    private void SetRefreshTokenCookie(string refreshToken)
-    {
-        CookieOptions cookieOptions = new()
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(30),
-        };
-
-        Response.Cookies.Append(RefreshTokenCookie, refreshToken, cookieOptions);
     }
 }

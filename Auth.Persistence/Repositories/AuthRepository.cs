@@ -1,6 +1,5 @@
 using Auth.Domain.Constants;
-using Auth.Domain.Models.Tokens;
-using Auth.Domain.Models.Users;
+using Auth.Domain.Models;
 using Auth.Domain.Repositories;
 using Auth.Persistence.Context;
 using FluentResults;
@@ -17,7 +16,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
             UserIdentify? user = await context.Users
                 .AsNoTracking()
                 .Where(u => u.UserEmail == userEmail)
-                .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password))
+                .Select(u => new UserIdentify(u.Id, u.Username, u.UserEmail, u.Password ?? string.Empty))
                 .FirstOrDefaultAsync();
 
             return user == null ? Result.Fail("Username or password is incorrect") : Result.Ok(user);
@@ -28,13 +27,30 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<bool>> CheckIsUserExists(string username, string userEmail)
+    public async Task<Result<User>> FindUserWithProvider(string userEmail)
+    {
+        try
+        {
+            User? user = await context.Users
+                .Include(u => u.UserOauthProviders)
+                .ThenInclude(p => p.Provider)
+                .FirstOrDefaultAsync(u => u.UserEmail == userEmail);
+
+            return user == null ? Result.Fail("User does not exist") : Result.Ok(user);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public async Task<Result<bool>> CheckIsUserExists(string userEmail)
     {
         try
         {
             bool userExists = await context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Username == username || u.UserEmail == userEmail);
+                .AnyAsync(u => u.UserEmail == userEmail);
 
             return Result.Ok(userExists);
         }
@@ -44,7 +60,7 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
         }
     }
 
-    public async Task<Result<User>> RegisterUser(User user)
+    public async Task<Result<User>> InsertUser(User user)
     {
         try
         {
@@ -108,5 +124,39 @@ public sealed class AuthRepository(AuthContext context) : IAuthRepository
     {
         context.Tokens.Where(t => t.UserId == userId).ExecuteDeleteAsync();
         return Result.Ok(true);
+    }
+
+    public async Task<Result<OauthProvider>> GetOauthProvider(string name)
+    {
+        try
+        {
+            OauthProvider? oauthProvider = await context.OauthProviders
+                .AsNoTracking()
+                .Where(op => op.Name == name)
+                .FirstOrDefaultAsync();
+
+            return oauthProvider == null || oauthProvider.Id == Guid.Empty
+                ? Result.Fail("Provider does not exist")
+                : Result.Ok(oauthProvider);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
+    }
+
+    public async Task<Result<User>> UpdateUserProvider(User user, UserOauthProvider provider)
+    {
+        try
+        {
+            context.Attach(provider.Provider);
+            context.UserOauthProviders.Add(provider);
+            await context.SaveChangesAsync();
+            return Result.Ok(user);
+        }
+        catch
+        {
+            return Result.Fail(ErrorMessage.Exception);
+        }
     }
 }

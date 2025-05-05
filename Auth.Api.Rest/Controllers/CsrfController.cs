@@ -1,4 +1,4 @@
-using Auth.Application.DTOs.Results;
+using Auth.Application.DTOs;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 
