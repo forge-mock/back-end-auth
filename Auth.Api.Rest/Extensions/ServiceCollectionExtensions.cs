@@ -12,6 +12,7 @@ internal static class ServiceCollectionExtensions
     internal static void AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthProviderService, AuthProviderService>();
     }
 
     internal static void AddRepositories(this IServiceCollection services)
@@ -22,6 +23,7 @@ internal static class ServiceCollectionExtensions
     internal static void AddApiRestServices(this IServiceCollection services)
     {
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IProvidersService, ProvidersService>();
         services.AddSingleton<IMiddlewareService, MiddlewareService>();
     }
 }
