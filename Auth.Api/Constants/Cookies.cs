@@ -1,4 +1,4 @@
-namespace Auth.Api.Rest.Constants;
+namespace Auth.Api.Constants;
 
 internal static class Cookies
 {

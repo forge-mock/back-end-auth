@@ -1,9 +1,9 @@
-using Auth.Api.Rest.Extensions;
-using Auth.Api.Rest.Interfaces;
+using Auth.Api.Extensions;
 using Auth.Persistence.Context;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Shared.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

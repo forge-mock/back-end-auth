@@ -1,11 +1,13 @@
-using Auth.Api.Rest.Interfaces;
-using Auth.Api.Rest.Services;
+using Auth.Api.Interfaces;
+using Auth.Api.Services;
 using Auth.Application.Interfaces;
 using Auth.Application.Services;
 using Auth.Domain.Repositories;
 using Auth.Persistence.Repositories;
+using Shared.Interfaces;
+using Shared.Services;
 
-namespace Auth.Api.Rest.Extensions;
+namespace Auth.Api.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
