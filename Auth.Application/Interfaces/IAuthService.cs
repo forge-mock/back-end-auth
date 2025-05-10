@@ -1,6 +1,7 @@
 using Auth.Application.DTOs;
 using Auth.Domain.Models;
 using FluentResults;
+using Shared.Models;
 
 namespace Auth.Application.Interfaces;
 

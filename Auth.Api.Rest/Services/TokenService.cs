@@ -2,11 +2,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Auth.Api.Rest.Interfaces;
-using Auth.Domain.Constants;
 using Auth.Domain.Models;
 using FluentResults;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Constants;
 
 namespace Auth.Api.Rest.Services;
 
