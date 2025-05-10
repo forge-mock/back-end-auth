@@ -1,7 +1,7 @@
 using FluentResults;
 using Google.Apis.Auth;
 
-namespace Auth.Api.Rest.Interfaces;
+namespace Auth.Api.Interfaces;
 
 public interface IProvidersService
 {

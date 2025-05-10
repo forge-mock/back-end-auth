@@ -8,8 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ForgeMock.Shared" Version="0.0.1" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
+        <PackageReference Include="ForgeMock.Shared" Version="0.0.2"/>
         <PackageReference Include="SonarAnalyzer.CSharp" Version="10.9.0.115408">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
