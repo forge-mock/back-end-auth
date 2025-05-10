@@ -6,6 +6,7 @@ using Auth.Domain.Models;
 using FluentResults;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Models;
 
 namespace Auth.Api.Rest.Controllers;
 

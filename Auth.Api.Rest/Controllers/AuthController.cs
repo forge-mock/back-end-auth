@@ -7,6 +7,7 @@ using FluentResults;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Shared.Models;
 
 namespace Auth.Api.Rest.Controllers;
 

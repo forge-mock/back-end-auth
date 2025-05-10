@@ -1,5 +1,6 @@
 using Auth.Domain.Models;
 using FluentResults;
+using Shared.Models;
 
 namespace Auth.Domain.Repositories;
 
