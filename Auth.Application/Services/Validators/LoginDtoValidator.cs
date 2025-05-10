@@ -1,5 +1,6 @@
 using Auth.Application.DTOs;
 using FluentValidation;
+using Shared.Validators;
 
 namespace Auth.Application.Services.Validators;
 
@@ -7,7 +8,7 @@ internal sealed class LoginDtoValidator : AbstractValidator<LoginDto>
 {
     internal LoginDtoValidator()
     {
-        BaseValidator.AddEmailRules(RuleFor(x => x.UserEmail));
-        BaseValidator.AddPasswordRules(RuleFor(x => x.Password));
+        LoginValidator.AddEmailRules(RuleFor(x => x.UserEmail));
+        LoginValidator.AddPasswordRules(RuleFor(x => x.Password));
     }
 }
