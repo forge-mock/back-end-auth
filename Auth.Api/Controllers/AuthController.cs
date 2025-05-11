@@ -1,5 +1,6 @@
 using Auth.Api.Constants;
 using Auth.Api.Interfaces;
+using Auth.Api.Models;
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Domain.Models;
@@ -49,7 +50,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
     }
 
     [HttpPost("refresh-token")]
-    public async Task<IActionResult> RefreshToken([FromBody] string token)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto refreshTokenDto)
     {
         try
         {
@@ -62,7 +63,7 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
 
         string? refreshToken = Request.Cookies[Cookies.RefreshToken];
         Result<Dictionary<string, string>> validateResult =
-            await tokenService.ValidateToken(token, refreshToken ?? string.Empty);
+            await tokenService.ValidateToken(refreshTokenDto.Token, refreshToken ?? string.Empty);
 
         if (validateResult.IsFailed)
         {
@@ -70,8 +71,12 @@ public class AuthController(IAntiforgery antiforgery, IAuthService authService, 
         }
 
         Guid userId = Guid.Parse(validateResult.Value[JwtRegisteredClaimNames.Sub]);
-        string username = validateResult.Value[JwtRegisteredClaimNames.Name];
-        string userEmail = validateResult.Value[JwtRegisteredClaimNames.Email];
+        string username = string.IsNullOrEmpty(refreshTokenDto.Name)
+            ? validateResult.Value[JwtRegisteredClaimNames.Name]
+            : refreshTokenDto.Name;
+        string userEmail = string.IsNullOrEmpty(refreshTokenDto.Email)
+            ? validateResult.Value[JwtRegisteredClaimNames.Email]
+            : refreshTokenDto.Email;
 
         Result<bool> validateRefreshTokenResult =
             await authService.ValidateRefreshToken(userId, refreshToken ?? string.Empty);
