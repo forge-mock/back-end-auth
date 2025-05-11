@@ -4,9 +4,10 @@ using Auth.Application.Services.Validators;
 using Auth.Domain.Models;
 using Auth.Domain.Repositories;
 using FluentResults;
+using FluentValidation.Results;
 using Shared.Constants;
 using Shared.Models;
-using ValidationResult = FluentValidation.Results.ValidationResult;
+using Shared.Services;
 
 namespace Auth.Application.Services;
 
