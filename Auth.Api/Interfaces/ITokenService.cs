@@ -1,7 +1,7 @@
 using Auth.Domain.Models;
 using FluentResults;
 
-namespace Auth.Api.Rest.Interfaces;
+namespace Auth.Api.Interfaces;
 
 public interface ITokenService
 {

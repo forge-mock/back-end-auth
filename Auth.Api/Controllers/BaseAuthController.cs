@@ -1,11 +1,11 @@
-using Auth.Api.Rest.Interfaces;
+using Auth.Api.Interfaces;
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Domain.Models;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Auth.Api.Rest.Controllers;
+namespace Auth.Api.Controllers;
 
 public class TokensDto(string accessToken, string refreshToken)
 {

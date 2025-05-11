@@ -2,7 +2,7 @@ using Auth.Application.DTOs;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Auth.Api.Rest.Controllers;
+namespace Auth.Api.Controllers;
 
 [ApiController]
 [Route("csrf")]

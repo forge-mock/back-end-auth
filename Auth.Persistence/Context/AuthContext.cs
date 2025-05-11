@@ -1,5 +1,5 @@
-﻿using Auth.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Shared.Models;
 
 namespace Auth.Persistence.Context;
 
