@@ -15,6 +15,7 @@ internal static class ServiceCollectionExtensions
     {
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAuthProviderService, AuthProviderService>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
     }
 
     internal static void AddRepositories(this IServiceCollection services)

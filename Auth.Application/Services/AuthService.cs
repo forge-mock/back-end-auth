@@ -6,12 +6,12 @@ using Auth.Domain.Repositories;
 using FluentResults;
 using FluentValidation.Results;
 using Shared.Constants;
+using Shared.Interfaces;
 using Shared.Models;
-using Shared.Services;
 
 namespace Auth.Application.Services;
 
-public sealed class AuthService(IAuthRepository authRepository) : IAuthService
+public sealed class AuthService(IPasswordHasher passwordHasher, IAuthRepository authRepository) : IAuthService
 {
     public async Task<Result<UserIdentify>> Authenticate(LoginDto login)
     {
@@ -33,7 +33,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 return result;
             }
 
-            bool isPasswordValid = PasswordHasher.Verify(login.Password, result.Value.Password);
+            bool isPasswordValid = passwordHasher.Verify(login.Password, result.Value.Password);
 
             return isPasswordValid ? Result.Ok(result.Value) : Result.Fail("Username or password is incorrect");
         }
@@ -68,7 +68,7 @@ public sealed class AuthService(IAuthRepository authRepository) : IAuthService
                 Id = Guid.NewGuid(),
                 Username = register.Username,
                 UserEmail = register.UserEmail,
-                Password = PasswordHasher.Hash(register.Password),
+                Password = passwordHasher.Hash(register.Password),
                 CreatedDate = DateTime.UtcNow,
             };
 
