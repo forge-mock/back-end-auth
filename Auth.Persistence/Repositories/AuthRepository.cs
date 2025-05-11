@@ -1,9 +1,10 @@
-using Auth.Domain.Constants;
 using Auth.Domain.Models;
 using Auth.Domain.Repositories;
 using Auth.Persistence.Context;
 using FluentResults;
 using Microsoft.EntityFrameworkCore;
+using Shared.Constants;
+using Shared.Models;
 
 namespace Auth.Persistence.Repositories;
 

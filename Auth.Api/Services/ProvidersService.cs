@@ -1,8 +1,8 @@
-using Auth.Api.Rest.Interfaces;
+using Auth.Api.Interfaces;
 using FluentResults;
 using Google.Apis.Auth;
 
-namespace Auth.Api.Rest.Services;
+namespace Auth.Api.Services;
 
 public sealed class ProvidersService : IProvidersService
 {

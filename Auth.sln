@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api.Rest", "Auth.Api.Rest\Auth.Api.Rest.csproj", "{50E4AB89-49A1-4A9B-8186-866E8C0522EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Api", "Auth.Api\Auth.Api.csproj", "{50E4AB89-49A1-4A9B-8186-866E8C0522EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{3648B005-6E55-4F1C-86A3-BE3505829933}"
 	ProjectSection(SolutionItems) = preProject

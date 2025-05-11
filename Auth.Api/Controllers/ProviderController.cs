@@ -1,13 +1,14 @@
-using Auth.Api.Rest.Constants;
-using Auth.Api.Rest.Interfaces;
+using Auth.Api.Constants;
+using Auth.Api.Interfaces;
 using Auth.Application.DTOs;
 using Auth.Application.Interfaces;
 using Auth.Domain.Models;
 using FluentResults;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Models;
 
-namespace Auth.Api.Rest.Controllers;
+namespace Auth.Api.Controllers;
 
 [ApiController]
 [Route("provider")]
